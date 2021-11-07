@@ -90,6 +90,21 @@ final class RedisCacheTest extends TestCase
      *
      * @throws InvalidArgumentException
      */
+    public function testSetWithTtl($key, $value): void
+    {
+        for ($i = 0; $i < 2; $i++) {
+            $this->assertTrue($this->cache->set($key, $value, 3600));
+        }
+    }
+
+    /**
+     * @dataProvider dataProvider
+     *
+     * @param $key
+     * @param $value
+     *
+     * @throws InvalidArgumentException
+     */
     public function testGet($key, $value): void
     {
         $this->cache->set($key, $value);
@@ -287,15 +302,18 @@ final class RedisCacheTest extends TestCase
 
     public function testZeroAndNegativeTtl(): void
     {
-        $this->cache->setMultiple(['a' => 1, 'b' => 2]);
-
-        $this->assertTrue($this->cache->has('a'));
-        $this->assertTrue($this->cache->has('b'));
-
-        $this->cache->set('a', 11, -1);
+        $this->cache->set('a', 1, -1);
         $this->assertFalse($this->cache->has('a'));
 
-        $this->cache->set('b', 22, 0);
+        $this->cache->set('b', 2, 0);
+        $this->assertFalse($this->cache->has('b'));
+
+        $this->cache->setMultiple(['a' => 1, 'b' => 2], -1);
+        $this->assertFalse($this->cache->has('a'));
+        $this->assertFalse($this->cache->has('b'));
+
+        $this->cache->setMultiple(['a' => 1, 'b' => 2], 0);
+        $this->assertFalse($this->cache->has('a'));
         $this->assertFalse($this->cache->has('b'));
     }
 
