@@ -32,8 +32,7 @@ final class RedisCacheTest extends TestCase
         parent::setUp();
 
         $this->cache = new RedisCache(new Client([
-            //'host' => '127.0.0.1',
-            'host' => 'redis',
+            'host' => '127.0.0.1',
             'port' => 6379,
             'prefix' => 'yiitest',
         ]));
