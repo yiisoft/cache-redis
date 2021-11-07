@@ -32,7 +32,8 @@ final class RedisCacheTest extends TestCase
         parent::setUp();
 
         $this->cache = new RedisCache(new Client([
-            'host' => '127.0.0.1',
+            //'host' => '127.0.0.1',
+            'host' => 'redis',
             'port' => 6379,
             'prefix' => 'yiitest',
         ]));
@@ -486,6 +487,18 @@ final class RedisCacheTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->has($key);
+    }
+
+    public function testGetMultipleThrowExceptionForEmptyArray(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->getMultiple([]);
+    }
+
+    public function testSetMultipleThrowExceptionForEmptyArray(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->setMultiple([]);
     }
 
     private function prepareKeysOfValues(array $values): array
