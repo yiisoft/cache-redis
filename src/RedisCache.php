@@ -45,12 +45,14 @@ final class RedisCache implements CacheInterface
 
     public function get($key, $default = null)
     {
-        if (!$this->has($key)) {
+        $this->validateKey($key);
+        $value = $this->client->get($key);
+
+        if ($value === null) {
             return $default;
         }
 
-        $result = $this->client->get($key);
-        return $result === null ? $default : unserialize($result);
+        return unserialize($value);
     }
 
     public function set($key, $value, $ttl = null): bool
