@@ -116,7 +116,7 @@ final class RedisCache implements CacheInterface
 
         /** @var mixed $value */
         foreach ($values as $key => $value) {
-            $serializeValues[(string) $key] = serialize($value);
+            $serializeValues[$key] = serialize($value);
         }
 
         if ($this->isInfinityTtl($ttl)) {
