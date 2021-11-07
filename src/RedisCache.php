@@ -88,7 +88,7 @@ final class RedisCache implements CacheInterface
         $this->validateKeys($keys);
         /** @var string[] $keys */
         $values = array_fill_keys($keys, $default);
-        /** @var string[]|null[] $valuesFromCache */
+        /** @var null[]|string[] $valuesFromCache */
         $valuesFromCache = $this->client->mget($keys);
 
         $i = 0;
