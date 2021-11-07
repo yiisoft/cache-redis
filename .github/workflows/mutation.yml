@@ -41,6 +41,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Start Redis v6
+        uses: superchargejs/redis-github-action@1.2.0
+        with:
+          redis-version: 6
+
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
