@@ -261,12 +261,15 @@ final class RedisCacheTest extends TestCase
 
     public function testSetMultipleFailure(): void
     {
-        $client = $this->getMockBuilder(ClientInterface::class)
+        $client = $this
+            ->getMockBuilder(ClientInterface::class)
             ->addMethods(['exec'])
             ->getMockForAbstractClass()
         ;
 
-        $client->method('exec')->willReturn([null]);
+        $client
+            ->method('exec')
+            ->willReturn([null]);
 
         $reflection = new ReflectionObject($this->cache);
         $property = $reflection->getProperty('client');
