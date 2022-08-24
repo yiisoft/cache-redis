@@ -28,3 +28,6 @@ phpunit.phar
 /phpunit.xml
 # phpunit cache
 .phpunit.result.cache
+
+# redis data
+/tests/docker/redis/data
