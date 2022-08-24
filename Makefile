@@ -11,19 +11,19 @@ test: test74 test80 test81
 test74:
 	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose build --pull php74
 	make create-cluster
-	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose run php74 vendor/bin/codecept run
+	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose run php74 vendor/bin/phpunit --colors=always
 	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose down
 
 test80:
 	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose build --pull php80
 	make create-cluster
-	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose run php80 vendor/bin/codecept run
+	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose run php80 vendor/bin/phpunit --colors=always
 	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose down
 
 test81:
 	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose build --pull php81
 	make create-cluster
-	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose run php81 vendor/bin/codecept run
+	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose run php81 vendor/bin/phpunit --colors=always
 	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose down
 
 create-cluster:
