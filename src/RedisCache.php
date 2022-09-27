@@ -31,16 +31,10 @@ use function unserialize;
 final class RedisCache implements CacheInterface
 {
     /**
-     * @var ClientInterface $client Predis client instance to use.
-     */
-    private ClientInterface $client;
-
-    /**
      * @param ClientInterface $client Predis client instance to use.
      */
-    public function __construct(ClientInterface $client)
+    public function __construct(private ClientInterface $client)
     {
-        $this->client = $client;
     }
 
     public function get($key, $default = null)
@@ -187,11 +181,9 @@ final class RedisCache implements CacheInterface
     /**
      * Converts iterable to array. If provided value is not iterable it throws an InvalidArgumentException.
      *
-     * @param mixed $iterable
      *
-     * @return array
      */
-    private function iterableToArray($iterable): array
+    private function iterableToArray(mixed $iterable): array
     {
         if (!is_iterable($iterable)) {
             throw new InvalidArgumentException('Iterable is expected, got ' . gettype($iterable));
@@ -201,19 +193,13 @@ final class RedisCache implements CacheInterface
         return $iterable instanceof Traversable ? iterator_to_array($iterable) : (array) $iterable;
     }
 
-    /**
-     * @param mixed $key
-     */
-    private function validateKey($key): void
+    private function validateKey(mixed $key): void
     {
         if (!is_string($key) || $key === '' || strpbrk($key, '{}()/\@:')) {
             throw new InvalidArgumentException('Invalid key value.');
         }
     }
 
-    /**
-     * @param array $keys
-     */
     private function validateKeys(array $keys): void
     {
         if (empty($keys)) {
