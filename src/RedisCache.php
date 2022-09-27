@@ -180,8 +180,6 @@ final class RedisCache implements CacheInterface
 
     /**
      * Converts iterable to array. If provided value is not iterable it throws an InvalidArgumentException.
-     *
-     *
      */
     private function iterableToArray(mixed $iterable): array
     {
