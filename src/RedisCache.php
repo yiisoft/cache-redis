@@ -73,8 +73,7 @@ final class RedisCache implements CacheInterface
         /** @var Status|null $result */
         $result = $this->isInfinityTtl($ttl)
             ? $this->client->set($key, serialize($value))
-            : $this->client->set($key, serialize($value), 'EX', $ttl)
-        ;
+            : $this->client->set($key, serialize($value), 'EX', $ttl);
 
         return $result !== null;
     }
@@ -98,9 +97,9 @@ final class RedisCache implements CacheInterface
     }
 
     /**
-     * @param iterable $keys
-     * @param mixed|null $default
-     * @return iterable
+     * @param iterable<string> $keys
+     * @param mixed $default
+     * @return iterable<string, mixed>
      * @throws InvalidArgumentException
      */
     public function getMultiple(iterable $keys, mixed $default = null): iterable
@@ -155,7 +154,7 @@ final class RedisCache implements CacheInterface
         $this->client->mset($serializeValues);
 
         foreach ($keys as $key) {
-            $this->client->expire($key, $ttl);
+            $this->client->expire($key, (int)$ttl);
         }
 
         $results = $this->client->exec();
@@ -184,6 +183,7 @@ final class RedisCache implements CacheInterface
             }
         }
 
+        /** @psalm-suppress MixedArgumentTypeCoercion */
         return empty($keys) || $this->client->del($keys) === count($keys);
     }
 
