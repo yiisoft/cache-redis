@@ -1,19 +1,6 @@
 version: '3.8'
 
 services:
-  php74:
-    container_name: cache-redis-php74
-    hostname: cache-redis-php74
-    build: ./php/74
-    volumes:
-      - ../runtime/.composer74:/root/.composer
-      - ../..:/var/www
-    dns:
-      - 8.8.8.8
-      - 4.4.4.4
-    networks: &network
-      - cache-redis-network
-
   php80:
     container_name: cache-redis-php80
     hostname: cache-redis-php80
@@ -24,7 +11,8 @@ services:
     dns:
       - 8.8.8.8
       - 4.4.4.4
-    networks: *network
+    networks: &network
+      - cache-redis-network
 
   php81:
     container_name: cache-redis-php81
