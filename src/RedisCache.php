@@ -6,7 +6,11 @@ namespace Yiisoft\Cache\Redis;
 
 use DateInterval;
 use DateTime;
+use Predis\Client;
 use Predis\ClientInterface;
+use Predis\Command\RawCommand;
+use Predis\Connection\ConnectionInterface;
+use Predis\Connection\StreamConnection;
 use Predis\Response\Status;
 use Psr\SimpleCache\CacheInterface;
 use Traversable;
@@ -32,12 +36,33 @@ final class RedisCache implements CacheInterface
      */
     private ClientInterface $client;
 
+    /** @var ConnectionInterface $connections Predis connections instance to use */
+    private ConnectionInterface $connections;
+
     /**
      * @param ClientInterface $client Predis client instance to use.
      */
     public function __construct(ClientInterface $client)
     {
         $this->client = $client;
+        $this->connections = $this->client->getConnection();
+    }
+
+    /**
+     * Checking Predis cluster usage
+     * @return bool
+     */
+    public function isCluster(): bool
+    {
+        $isCluster = false;
+        foreach ($this->connections as $connection) {
+            /** @var StreamConnection $connection */
+            $info = $connection->executeCommand(new RawCommand('INFO', ['Cluster']));
+            $clusterEnabled = explode('cluster_enabled:', trim($info));
+            $isCluster = (bool)$clusterEnabled[1];
+        }
+
+        return $isCluster;
     }
 
     /**
@@ -89,10 +114,20 @@ final class RedisCache implements CacheInterface
     }
 
     /**
+     * If a cluster is used, all nodes will be cleared
      * @return bool
      */
     public function clear(): bool
     {
+        if ($this->isCluster()) {
+            foreach ($this->connections as $connection) {
+                /** @var StreamConnection $connection */
+                $client = new Client($connection->getParameters());
+                $client->flushdb();
+            }
+            return true;
+        }
+
         return $this->client->flushdb() !== null;
     }
 

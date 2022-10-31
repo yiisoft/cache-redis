@@ -46,13 +46,13 @@ final class RedisClusterCacheTest extends TestCase
                 ['host' => 'redis4', 'port' => 6384,],
                 ['host' => 'redis5', 'port' => 6385,],
                 ['host' => 'redis6', 'port' => 6386,],
-                'prefix' => 'yiitest',
             ],
             [
                 'cluster' => 'redis',
                 'parameters' => [
                     'password' => 'Password',
                 ],
+                'prefix' => 'yiitest',
             ],
         ));
     }
@@ -89,6 +89,15 @@ final class RedisClusterCacheTest extends TestCase
             'string_with_number_key' => ['111', 11],
             'string_with_number_key_1' => ['022', 22],
         ];
+    }
+
+    /**
+     * Check redis cluster connection
+     * @return void
+     */
+    public function testIsCLuster(): void
+    {
+        $this->assertTrue($this->cache->isCluster());
     }
 
     /**
@@ -240,131 +249,6 @@ final class RedisClusterCacheTest extends TestCase
     }
 
     /**
-     * @dataProvider dataProviderSetMultiple
-     *
-     * @param int|null $ttl
-     *
-     * @throws InvalidArgumentException
-     */
-    public function testSetMultiple(?int $ttl): void
-    {
-        $data = $this->getDataProviderData();
-        $this->cache->setMultiple($data, $ttl);
-
-        $reflection = new ReflectionObject($this->cache);
-        $property = $reflection->getProperty('client');
-        $property->setAccessible(true);
-        $client = $property->getValue($this->cache);
-        $property->setAccessible(false);
-
-        foreach ($data as $key => $value) {
-            $this->assertSameExceptObject($value, $this->cache->get((string) $key));
-            $this->assertSame($ttl === null ? -1 : $ttl, $client->ttl($key));
-        }
-    }
-
-    /**
-     * @dataProvider dataProviderSetMultiple
-     *
-     * @param int|null $ttl
-     *
-     * @throws InvalidArgumentException
-     */
-    public function testReSetMultiple(?int $ttl): void
-    {
-        $data = $this->getDataProviderData();
-
-        $this->assertTrue($this->cache->setMultiple($data, $ttl));
-
-        foreach ($data as $key => $value) {
-            $this->assertSameExceptObject($value, $this->cache->get((string) $key));
-        }
-
-        $this->assertTrue($this->cache->setMultiple($data, $ttl));
-
-        foreach ($data as $key => $value) {
-            $this->assertSameExceptObject($value, $this->cache->get((string) $key));
-        }
-    }
-
-    /**
-     * @return void
-     * @throws InvalidArgumentException
-     */
-    public function testSetMultipleFailure(): void
-    {
-        $client = $this
-            ->getMockBuilder(ClientInterface::class)
-            ->addMethods(['exec'])
-            ->getMockForAbstractClass()
-        ;
-
-        $client
-            ->method('exec')
-            ->willReturn([null]);
-
-        $reflection = new ReflectionObject($this->cache);
-        $property = $reflection->getProperty('client');
-        $property->setAccessible(true);
-        $property->setValue($this->cache, $client);
-        $property->setAccessible(false);
-
-        $this->assertFalse($this->cache->setMultiple(['key' => 'value'], time()));
-    }
-
-    /**
-     * @return void
-     * @throws InvalidArgumentException
-     */
-    public function testGetMultiple(): void
-    {
-        $data = $this->getDataProviderData();
-        $keys = $this->prepareKeysOfValues($data);
-        $this->cache->setMultiple($data);
-
-        $this->assertSameExceptObject($data, $this->cache->getMultiple($keys));
-    }
-
-    /**
-     * @return void
-     * @throws InvalidArgumentException
-     */
-    public function testDeleteMultiple(): void
-    {
-        $data = $this->getDataProviderData();
-        $keys = $this->prepareKeysOfValues($data);
-        $this->cache->setMultiple($data);
-
-        $this->assertSameExceptObject($data, $this->cache->getMultiple($keys));
-        $this->assertTrue($this->cache->deleteMultiple($keys));
-
-        $emptyData = array_map(static fn () => null, $data);
-
-        $this->assertSameExceptObject($emptyData, $this->cache->getMultiple($keys));
-    }
-
-    /**
-     * @return void
-     * @throws InvalidArgumentException
-     */
-    public function testZeroAndNegativeTtl(): void
-    {
-        $this->cache->set('a', 1, -1);
-        $this->assertFalse($this->cache->has('a'));
-
-        $this->cache->set('b', 2, 0);
-        $this->assertFalse($this->cache->has('b'));
-
-        $this->cache->setMultiple(['a' => 1, 'b' => 2], -1);
-        $this->assertFalse($this->cache->has('a'));
-        $this->assertFalse($this->cache->has('b'));
-
-        $this->cache->setMultiple(['a' => 1, 'b' => 2], 0);
-        $this->assertFalse($this->cache->has('a'));
-        $this->assertFalse($this->cache->has('b'));
-    }
-
-    /**
      * Data provider for {@see testNormalizeTtl()}
      *
      * @throws Exception
@@ -437,21 +321,6 @@ final class RedisClusterCacheTest extends TestCase
     }
 
     /**
-     * @dataProvider iterableProvider
-     *
-     * @param array $array
-     * @param iterable $iterable
-     *
-     * @throws InvalidArgumentException
-     */
-    public function testValuesAsIterable(array $array, iterable $iterable): void
-    {
-        $this->cache->setMultiple($iterable);
-
-        $this->assertSameExceptObject($array, $this->cache->getMultiple(array_keys($array)));
-    }
-
-    /**
      * @return array
      */
     public function invalidKeyProvider(): array
@@ -466,128 +335,6 @@ final class RedisClusterCacheTest extends TestCase
             'psr-reserved' => ['{}()/\@:'],
             'empty-string' => [''],
         ];
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
-     */
-    public function testGetThrowExceptionForInvalidKey($key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->cache->get($key);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
-     */
-    public function testSetThrowExceptionForInvalidKey($key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->cache->set($key, 'value');
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
-     */
-    public function testDeleteThrowExceptionForInvalidKey($key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->cache->delete($key);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
-     */
-    public function testGetMultipleThrowExceptionForInvalidKeys($key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->cache->getMultiple([$key]);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
-     */
-    public function testGetMultipleThrowExceptionForInvalidKeysNotIterable($key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Iterable is expected, got ' . gettype($key));
-        $this->cache->getMultiple($key);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
-     */
-    public function testSetMultipleThrowExceptionForInvalidKeysNotIterable($key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Iterable is expected, got ' . gettype($key));
-        $this->cache->setMultiple($key);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
-     */
-    public function testDeleteMultipleThrowExceptionForInvalidKeys($key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->cache->deleteMultiple([$key]);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
-     */
-    public function testDeleteMultipleThrowExceptionForInvalidKeysNotIterable($key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Iterable is expected, got ' . gettype($key));
-        $this->cache->deleteMultiple($key);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
-     */
-    public function testHasThrowExceptionForInvalidKey($key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->cache->has($key);
-    }
-
-    /**
-     * @return void
-     * @throws InvalidArgumentException
-     */
-    public function testGetMultipleThrowExceptionForEmptyArray(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->cache->getMultiple([]);
-    }
-
-    /**
-     * @return void
-     * @throws InvalidArgumentException
-     */
-    public function testSetMultipleThrowExceptionForEmptyArray(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->cache->setMultiple([]);
     }
 
     /**
