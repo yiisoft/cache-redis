@@ -31,6 +31,9 @@ final class RedisClusterCacheTest extends TestCase
 {
     private RedisCache $cache;
 
+    /**
+     * @return void
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -54,6 +57,9 @@ final class RedisClusterCacheTest extends TestCase
         ));
     }
 
+    /**
+     * @return void
+     */
     protected function tearDown(): void
     {
         $this->cache->clear();
@@ -61,6 +67,9 @@ final class RedisClusterCacheTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * @return array
+     */
     public function dataProvider(): array
     {
         $object = new stdClass();
@@ -85,12 +94,12 @@ final class RedisClusterCacheTest extends TestCase
     /**
      * @dataProvider dataProvider
      *
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param mixed $value
      *
      * @throws InvalidArgumentException
      */
-    public function testSet($key, $value): void
+    public function testSet(string $key, mixed $value): void
     {
         for ($i = 0; $i < 2; $i++) {
             $this->assertTrue($this->cache->set($key, $value));
@@ -100,12 +109,12 @@ final class RedisClusterCacheTest extends TestCase
     /**
      * @dataProvider dataProvider
      *
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param mixed $value
      *
      * @throws InvalidArgumentException
      */
-    public function testSetWithTtl($key, $value): void
+    public function testSetWithTtl(string $key, mixed $value): void
     {
         for ($i = 0; $i < 2; $i++) {
             $this->assertTrue($this->cache->set($key, $value, 3600));
@@ -171,6 +180,10 @@ final class RedisClusterCacheTest extends TestCase
         $this->assertTrue($this->cache->has($key));
     }
 
+    /**
+     * @return void
+     * @throws InvalidArgumentException
+     */
     public function testDeleteAndHasAndGetNonExistent(): void
     {
         $this->assertTrue($this->cache->delete('non-existent-key'));
@@ -274,6 +287,10 @@ final class RedisClusterCacheTest extends TestCase
         }
     }
 
+    /**
+     * @return void
+     * @throws InvalidArgumentException
+     */
     public function testSetMultipleFailure(): void
     {
         $client = $this
@@ -295,6 +312,10 @@ final class RedisClusterCacheTest extends TestCase
         $this->assertFalse($this->cache->setMultiple(['key' => 'value'], time()));
     }
 
+    /**
+     * @return void
+     * @throws InvalidArgumentException
+     */
     public function testGetMultiple(): void
     {
         $data = $this->getDataProviderData();
@@ -304,6 +325,10 @@ final class RedisClusterCacheTest extends TestCase
         $this->assertSameExceptObject($data, $this->cache->getMultiple($keys));
     }
 
+    /**
+     * @return void
+     * @throws InvalidArgumentException
+     */
     public function testDeleteMultiple(): void
     {
         $data = $this->getDataProviderData();
@@ -318,6 +343,10 @@ final class RedisClusterCacheTest extends TestCase
         $this->assertSameExceptObject($emptyData, $this->cache->getMultiple($keys));
     }
 
+    /**
+     * @return void
+     * @throws InvalidArgumentException
+     */
     public function testZeroAndNegativeTtl(): void
     {
         $this->cache->set('a', 1, -1);
@@ -374,6 +403,9 @@ final class RedisClusterCacheTest extends TestCase
         $this->assertSameExceptObject($expectedResult, $result);
     }
 
+    /**
+     * @return array
+     */
     public function iterableProvider(): array
     {
         return [
@@ -419,6 +451,9 @@ final class RedisClusterCacheTest extends TestCase
         $this->assertSameExceptObject($array, $this->cache->getMultiple(array_keys($array)));
     }
 
+    /**
+     * @return array
+     */
     public function invalidKeyProvider(): array
     {
         return [
@@ -535,23 +570,38 @@ final class RedisClusterCacheTest extends TestCase
         $this->cache->has($key);
     }
 
+    /**
+     * @return void
+     * @throws InvalidArgumentException
+     */
     public function testGetMultipleThrowExceptionForEmptyArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->getMultiple([]);
     }
 
+    /**
+     * @return void
+     * @throws InvalidArgumentException
+     */
     public function testSetMultipleThrowExceptionForEmptyArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->setMultiple([]);
     }
 
+    /**
+     * @param array $values
+     * @return array
+     */
     private function prepareKeysOfValues(array $values): array
     {
         return array_map('\strval', array_keys($values));
     }
 
+    /**
+     * @return array
+     */
     private function getDataProviderData(): array
     {
         $dataProvider = $this->dataProvider();
@@ -564,7 +614,12 @@ final class RedisClusterCacheTest extends TestCase
         return $data;
     }
 
-    private function assertSameExceptObject($expected, $actual): void
+    /**
+     * @param mixed $expected
+     * @param mixed $actual
+     * @return void
+     */
+    private function assertSameExceptObject(mixed $expected, mixed $actual): void
     {
         // Assert for all types.
         $this->assertEquals($expected, $actual);
