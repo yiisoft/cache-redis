@@ -161,10 +161,8 @@ final class RedisCache implements CacheInterface
         $results = $this->client->exec();
 
         /** @var Status|null $result */
-        foreach ((array) $results as $result) {
-            if ($result === null) {
-                return false;
-            }
+        if (in_array(null, (array)$results, true)) {
+            return false;
         }
 
         return true;
