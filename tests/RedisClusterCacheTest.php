@@ -326,15 +326,20 @@ final class RedisClusterCacheTest extends TestCase
     public function invalidKeyProvider(): array
     {
         return [
-            'int' => [1],
-            'float' => [1.1],
-            'null' => [null],
-            'bool' => [true],
-            'object' => [new stdClass()],
-            'callable' => [fn () => 'key'],
             'psr-reserved' => ['{}()/\@:'],
             'empty-string' => [''],
         ];
+    }
+
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testGetThrowExceptionForInvalidKey($key): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->get($key);
     }
 
     /**
