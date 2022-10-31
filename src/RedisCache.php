@@ -36,8 +36,10 @@ final class RedisCache implements CacheInterface
      */
     private ClientInterface $client;
 
-    /** @var ConnectionInterface $connections Predis connections instance to use */
-    private ConnectionInterface $connections;
+    /**
+     * @var ConnectionInterface|array<ConnectionInterface> $connections Predis connections instance to use
+     */
+    private ConnectionInterface|array $connections;
 
     /**
      * @param ClientInterface $client Predis client instance to use.
@@ -55,9 +57,10 @@ final class RedisCache implements CacheInterface
     public function isCluster(): bool
     {
         $isCluster = false;
+        /** @psalm-suppress MixedAssignment, PossibleRawObjectIteration */
         foreach ($this->connections as $connection) {
             /** @var StreamConnection $connection */
-            $info = $connection->executeCommand(new RawCommand('INFO', ['Cluster']));
+            $info = (string)$connection->executeCommand(new RawCommand('INFO', ['Cluster']));
             $clusterEnabled = explode('cluster_enabled:', trim($info));
             $isCluster = (bool)$clusterEnabled[1];
         }
@@ -120,6 +123,7 @@ final class RedisCache implements CacheInterface
     public function clear(): bool
     {
         if ($this->isCluster()) {
+            /** @psalm-suppress MixedAssignment, PossibleRawObjectIteration */
             foreach ($this->connections as $connection) {
                 /** @var StreamConnection $connection */
                 $client = new Client($connection->getParameters());
