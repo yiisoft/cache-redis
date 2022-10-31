@@ -40,6 +40,12 @@ final class RedisCache implements CacheInterface
         $this->client = $client;
     }
 
+    /**
+     * @param string $key
+     * @param mixed|null $default
+     * @return mixed
+     * @throws InvalidArgumentException
+     */
     public function get(string $key, mixed $default = null): mixed
     {
         $this->validateKey($key);
@@ -47,6 +53,13 @@ final class RedisCache implements CacheInterface
         return $value === null ? $default : unserialize($value);
     }
 
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @param int|DateInterval|null $ttl
+     * @return bool
+     * @throws InvalidArgumentException
+     */
     public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         $ttl = $this->normalizeTtl($ttl);
@@ -66,16 +79,30 @@ final class RedisCache implements CacheInterface
         return $result !== null;
     }
 
+    /**
+     * @param string $key
+     * @return bool
+     * @throws InvalidArgumentException
+     */
     public function delete(string $key): bool
     {
         return !$this->has($key) || $this->client->del($key) === 1;
     }
 
+    /**
+     * @return bool
+     */
     public function clear(): bool
     {
         return $this->client->flushdb() !== null;
     }
 
+    /**
+     * @param iterable $keys
+     * @param mixed|null $default
+     * @return iterable
+     * @throws InvalidArgumentException
+     */
     public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         /** @var string[] $keys */
@@ -96,6 +123,12 @@ final class RedisCache implements CacheInterface
         return $values;
     }
 
+    /**
+     * @param iterable $values
+     * @param int|DateInterval|null $ttl
+     * @return bool
+     * @throws InvalidArgumentException
+     */
     public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
@@ -137,6 +170,11 @@ final class RedisCache implements CacheInterface
         return true;
     }
 
+    /**
+     * @param iterable $keys
+     * @return bool
+     * @throws InvalidArgumentException
+     */
     public function deleteMultiple(iterable $keys): bool
     {
         $keys = $this->iterableToArray($keys);
@@ -151,6 +189,11 @@ final class RedisCache implements CacheInterface
         return empty($keys) || $this->client->del($keys) === count($keys);
     }
 
+    /**
+     * @param string $key
+     * @return bool
+     * @throws InvalidArgumentException
+     */
     public function has(string $key): bool
     {
         $this->validateKey($key);
@@ -194,6 +237,11 @@ final class RedisCache implements CacheInterface
         return $iterable instanceof Traversable ? iterator_to_array($iterable) : (array) $iterable;
     }
 
+    /**
+     * @param string $key
+     * @return void
+     * @throws InvalidArgumentException
+     */
     private function validateKey(string $key): void
     {
         if ($key === '' || strpbrk($key, '{}()/\@:')) {
@@ -203,6 +251,8 @@ final class RedisCache implements CacheInterface
 
     /**
      * @param string[] $keys
+     * @return void
+     * @throws InvalidArgumentException
      */
     private function validateKeys(array $keys): void
     {
@@ -215,11 +265,19 @@ final class RedisCache implements CacheInterface
         }
     }
 
+    /**
+     * @param int|null $ttl
+     * @return bool
+     */
     private function isExpiredTtl(?int $ttl): bool
     {
         return $ttl !== null && $ttl <= 0;
     }
 
+    /**
+     * @param int|null $ttl
+     * @return bool
+     */
     private function isInfinityTtl(?int $ttl): bool
     {
         return $ttl === null;
