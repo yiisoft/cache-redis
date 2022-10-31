@@ -335,6 +335,28 @@ final class RedisClusterCacheTest extends TestCase
     }
 
     /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testHasThrowExceptionForInvalidKey($key): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->has($key);
+    }
+
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testDeleteThrowExceptionForInvalidKey($key): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->delete($key);
+    }
+
+    /**
      * @param array $values
      *
      * @return array
