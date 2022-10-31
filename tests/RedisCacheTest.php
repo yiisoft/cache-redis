@@ -19,7 +19,6 @@ use Yiisoft\Cache\Redis\RedisCache;
 
 use function array_keys;
 use function array_map;
-use function gettype;
 use function is_array;
 use function is_object;
 use function time;
@@ -76,7 +75,7 @@ final class RedisCacheTest extends TestCase
      *
      * @throws InvalidArgumentException
      */
-    public function testSet($key, $value): void
+    public function testSet(string $key, mixed $value): void
     {
         for ($i = 0; $i < 2; $i++) {
             $this->assertTrue($this->cache->set($key, $value));
@@ -91,7 +90,7 @@ final class RedisCacheTest extends TestCase
      *
      * @throws InvalidArgumentException
      */
-    public function testSetWithTtl($key, $value): void
+    public function testSetWithTtl(string $key, mixed $value): void
     {
         for ($i = 0; $i < 2; $i++) {
             $this->assertTrue($this->cache->set($key, $value, 3600));
@@ -408,12 +407,6 @@ final class RedisCacheTest extends TestCase
     public function invalidKeyProvider(): array
     {
         return [
-            'int' => [1],
-            'float' => [1.1],
-            'null' => [null],
-            'bool' => [true],
-            'object' => [new stdClass()],
-            'callable' => [fn () => 'key'],
             'psr-reserved' => ['{}()/\@:'],
             'empty-string' => [''],
         ];
@@ -468,46 +461,10 @@ final class RedisCacheTest extends TestCase
      *
      * @param mixed $key
      */
-    public function testGetMultipleThrowExceptionForInvalidKeysNotIterable($key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Iterable is expected, got ' . gettype($key));
-        $this->cache->getMultiple($key);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
-     */
-    public function testSetMultipleThrowExceptionForInvalidKeysNotIterable($key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Iterable is expected, got ' . gettype($key));
-        $this->cache->setMultiple($key);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
-     */
     public function testDeleteMultipleThrowExceptionForInvalidKeys($key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->deleteMultiple([$key]);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
-     */
-    public function testDeleteMultipleThrowExceptionForInvalidKeysNotIterable($key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Iterable is expected, got ' . gettype($key));
-        $this->cache->deleteMultiple($key);
     }
 
     /**
@@ -550,7 +507,7 @@ final class RedisCacheTest extends TestCase
         return $data;
     }
 
-    private function assertSameExceptObject($expected, $actual): void
+    private function assertSameExceptObject(mixed $expected, mixed $actual): void
     {
         // Assert for all types.
         $this->assertEquals($expected, $actual);
