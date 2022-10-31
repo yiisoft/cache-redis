@@ -37,7 +37,7 @@ final class RedisCache implements CacheInterface
     private ClientInterface $client;
 
     /**
-     * @var ConnectionInterface|array<ConnectionInterface> $connections Predis connections instance to use
+     * @var array<ConnectionInterface>|ConnectionInterface $connections Predis connections instance to use
      */
     private ConnectionInterface|array $connections;
 
@@ -52,6 +52,7 @@ final class RedisCache implements CacheInterface
 
     /**
      * Checking Predis cluster usage
+     *
      * @return bool
      */
     public function isCluster(): bool
@@ -71,6 +72,7 @@ final class RedisCache implements CacheInterface
     /**
      * @param string $key
      * @param mixed|null $default
+     *
      * @return mixed
      * @throws InvalidArgumentException
      */
@@ -85,6 +87,7 @@ final class RedisCache implements CacheInterface
      * @param string $key
      * @param mixed $value
      * @param int|DateInterval|null $ttl
+     *
      * @return bool
      * @throws InvalidArgumentException
      */
@@ -108,6 +111,7 @@ final class RedisCache implements CacheInterface
 
     /**
      * @param string $key
+     *
      * @return bool
      * @throws InvalidArgumentException
      */
@@ -118,6 +122,7 @@ final class RedisCache implements CacheInterface
 
     /**
      * If a cluster is used, all nodes will be cleared
+     *
      * @return bool
      */
     public function clear(): bool
@@ -138,8 +143,10 @@ final class RedisCache implements CacheInterface
     /**
      * @param iterable<string> $keys
      * @param mixed $default
-     * @return iterable<string, mixed>
+     *
      * @throws InvalidArgumentException
+     *
+     * @return iterable<string, mixed>
      */
     public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
@@ -164,8 +171,10 @@ final class RedisCache implements CacheInterface
     /**
      * @param iterable $values
      * @param int|DateInterval|null $ttl
-     * @return bool
+     *
      * @throws InvalidArgumentException
+     *
+     * @return bool
      */
     public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
@@ -208,8 +217,10 @@ final class RedisCache implements CacheInterface
 
     /**
      * @param iterable $keys
-     * @return bool
+     *
      * @throws InvalidArgumentException
+     *
+     * @return bool
      */
     public function deleteMultiple(iterable $keys): bool
     {
@@ -228,8 +239,10 @@ final class RedisCache implements CacheInterface
 
     /**
      * @param string $key
-     * @return bool
+     *
      * @throws InvalidArgumentException
+     *
+     * @return bool
      */
     public function has(string $key): bool
     {
@@ -276,7 +289,7 @@ final class RedisCache implements CacheInterface
 
     /**
      * @param string $key
-     * @return void
+     *
      * @throws InvalidArgumentException
      */
     private function validateKey(string $key): void
@@ -288,7 +301,7 @@ final class RedisCache implements CacheInterface
 
     /**
      * @param string[] $keys
-     * @return void
+     *
      * @throws InvalidArgumentException
      */
     private function validateKeys(array $keys): void
@@ -304,6 +317,7 @@ final class RedisCache implements CacheInterface
 
     /**
      * @param int|null $ttl
+     *
      * @return bool
      */
     private function isExpiredTtl(?int $ttl): bool
@@ -313,6 +327,7 @@ final class RedisCache implements CacheInterface
 
     /**
      * @param int|null $ttl
+     *
      * @return bool
      */
     private function isInfinityTtl(?int $ttl): bool

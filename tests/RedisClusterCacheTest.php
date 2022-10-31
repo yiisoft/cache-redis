@@ -31,9 +31,6 @@ final class RedisClusterCacheTest extends TestCase
 {
     private RedisCache $cache;
 
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -57,9 +54,6 @@ final class RedisClusterCacheTest extends TestCase
         ));
     }
 
-    /**
-     * @return void
-     */
     protected function tearDown(): void
     {
         $this->cache->clear();
@@ -93,7 +87,6 @@ final class RedisClusterCacheTest extends TestCase
 
     /**
      * Check redis cluster connection
-     * @return void
      */
     public function testIsCLuster(): void
     {
@@ -190,7 +183,6 @@ final class RedisClusterCacheTest extends TestCase
     }
 
     /**
-     * @return void
      * @throws InvalidArgumentException
      */
     public function testDeleteAndHasAndGetNonExistent(): void
@@ -344,6 +336,7 @@ final class RedisClusterCacheTest extends TestCase
 
     /**
      * @param array $values
+     *
      * @return array
      */
     private function prepareKeysOfValues(array $values): array
@@ -369,7 +362,6 @@ final class RedisClusterCacheTest extends TestCase
     /**
      * @param mixed $expected
      * @param mixed $actual
-     * @return void
      */
     private function assertSameExceptObject(mixed $expected, mixed $actual): void
     {
