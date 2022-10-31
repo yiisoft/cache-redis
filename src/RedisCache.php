@@ -73,8 +73,9 @@ final class RedisCache implements CacheInterface
      * @param string $key
      * @param mixed|null $default
      *
-     * @return mixed
      * @throws InvalidArgumentException
+     *
+     * @return mixed
      */
     public function get(string $key, mixed $default = null): mixed
     {
@@ -86,10 +87,11 @@ final class RedisCache implements CacheInterface
     /**
      * @param string $key
      * @param mixed $value
-     * @param int|DateInterval|null $ttl
+     * @param DateInterval|int|null $ttl
+     *
+     * @throws InvalidArgumentException
      *
      * @return bool
-     * @throws InvalidArgumentException
      */
     public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
@@ -112,8 +114,9 @@ final class RedisCache implements CacheInterface
     /**
      * @param string $key
      *
-     * @return bool
      * @throws InvalidArgumentException
+     *
+     * @return bool
      */
     public function delete(string $key): bool
     {
@@ -170,7 +173,7 @@ final class RedisCache implements CacheInterface
 
     /**
      * @param iterable $values
-     * @param int|DateInterval|null $ttl
+     * @param DateInterval|int|null $ttl
      *
      * @throws InvalidArgumentException
      *
@@ -207,12 +210,7 @@ final class RedisCache implements CacheInterface
 
         $results = $this->client->exec();
 
-        /** @var Status|null $result */
-        if (in_array(null, (array)$results, true)) {
-            return false;
-        }
-
-        return true;
+        return !in_array(null, (array)$results, true);
     }
 
     /**
