@@ -9,7 +9,6 @@ use DateInterval;
 use Exception;
 use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
-use Predis\ClientInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Predis\Client;
 use ReflectionException;
@@ -19,10 +18,8 @@ use Yiisoft\Cache\Redis\RedisCache;
 
 use function array_keys;
 use function array_map;
-use function gettype;
 use function is_array;
 use function is_object;
-use function time;
 
 /**
  * Tests for Redis cluster instance
@@ -354,6 +351,46 @@ final class RedisClusterCacheTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->delete($key);
+    }
+
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testGetMultipleThrowExceptionForInvalidKeys($key): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->getMultiple([$key]);
+    }
+
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testDeleteMultipleThrowExceptionForInvalidKeys($key): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->deleteMultiple([$key]);
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function testGetMultipleThrowExceptionForEmptyArray(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->getMultiple([]);
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function testSetMultipleThrowExceptionForEmptyArray(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->setMultiple([]);
     }
 
     /**
