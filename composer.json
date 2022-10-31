@@ -31,7 +31,7 @@
     ],
     "require": {
         "php": "^8.0",
-        "predis/predis": "^1.1",
+        "predis/predis": "^2.0",
         "psr/simple-cache": "^2.0|^3.0"
     },
     "require-dev": {
