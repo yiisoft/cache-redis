@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 php:8.0.22-fpm-alpine
+FROM --platform=linux/amd64 php:8.0.25-fpm-alpine
 
 RUN apk add unzip zlib-dev libzip-dev
 
