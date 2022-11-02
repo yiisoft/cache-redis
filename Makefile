@@ -30,5 +30,5 @@ connect-cluster:
 mutation-test:
 	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose build --pull php$(v)
 	make create-cluster
-	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose run php$(v) vendor/bin/roave-infection-static-analysis-plugin -j2 --ignore-msi-with-no-mutations --only-covered
+	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose run php$(v) php -dpcov.enabled=1 -dpcov.directory=. vendor/bin/roave-infection-static-analysis-plugin -j2 --ignore-msi-with-no-mutations --only-covered
 	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose down
