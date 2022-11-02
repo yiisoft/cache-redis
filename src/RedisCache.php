@@ -8,7 +8,6 @@ use DateInterval;
 use DateTime;
 use Predis\Client;
 use Predis\ClientInterface;
-use Predis\Command\RawCommand;
 use Predis\Connection\ConnectionInterface;
 use Predis\Connection\StreamConnection;
 use Predis\Response\Status;
@@ -57,16 +56,16 @@ final class RedisCache implements CacheInterface
      */
     public function isCluster(): bool
     {
-        $isCluster = false;
         /** @psalm-suppress MixedAssignment, PossibleRawObjectIteration */
         foreach ($this->connections as $connection) {
             /** @var StreamConnection $connection */
-            $info = (string)$connection->executeCommand(new RawCommand('INFO', ['Cluster']));
-            $clusterEnabled = explode('cluster_enabled:', trim($info));
-            $isCluster = (bool)$clusterEnabled[1];
+            $cluster = (new Client($connection->getParameters()))->info('Cluster');
+            if (isset($cluster['Cluster']['cluster_enabled']) && 1 === (int)$cluster['Cluster']['cluster_enabled']) {
+                return true;
+            }
         }
 
-        return $isCluster;
+        return false;
     }
 
     /**
