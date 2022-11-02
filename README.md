@@ -106,6 +106,32 @@ The code is statically analyzed with [Psalm](https://psalm.dev/). To run static 
 ./vendor/bin/psalm
 ```
 
+## Testing in Docker
+
+### Prepare
+
+```bash
+make build && make create-cluster
+```
+
+### Unit testing
+
+```bash
+make test
+```
+
+or run test with another PHP version
+
+```bash
+make test80
+```
+
+### Mutation testing
+
+```bash
+make mutation-test v=80
+```
+
 ## License
 
 The Yii Caching Library - Redis Handler is free software. It is released under the terms of the BSD License.
