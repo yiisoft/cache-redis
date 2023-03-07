@@ -15,6 +15,9 @@ build:
         "xdebug.mode": coverage
 
   nodes:
+    node-that-needs-docker:
+      environment:
+        docker: true
     analysis:
       tests:
         override:
