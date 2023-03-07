@@ -36,5 +36,5 @@ mutation-test:
 coverage:
 	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose build --pull php80
 	make create-cluster
-	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose run php80 vendor/bin/phpunit --coverage-clover ./coverage.xml
+	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose run php80 vendor/bin/phpunit --coverage-clover coverage.xml
 	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose down

@@ -24,7 +24,7 @@ build:
 
       tests:
         override:
-          - command: make coverage
+          - command: make build && make coverage
             on_node: 1
             coverage:
               file: coverage.xml
