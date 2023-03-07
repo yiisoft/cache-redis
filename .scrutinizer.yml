@@ -9,15 +9,14 @@ build:
   image: default-bionic
 
   nodes:
-    node-that-needs-docker:
-      environment:
-        docker: true
     analysis:
       tests:
         override:
           - php-scrutinizer-run
 
     phpunit:
+      environment:
+        docker: true
       dependencies:
         override:
           - make build
