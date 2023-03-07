@@ -24,7 +24,7 @@ build:
 
       tests:
         override:
-          - command: "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
+          - command: make coverage
             on_node: 1
             coverage:
               file: coverage.xml
