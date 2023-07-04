@@ -28,16 +28,10 @@ use function unserialize;
 final class RedisCache implements CacheInterface
 {
     /**
-     * @var ClientInterface $client Predis client instance to use.
-     */
-    private ClientInterface $client;
-
-    /**
      * @param ClientInterface $client Predis client instance to use.
      */
-    public function __construct(ClientInterface $client)
+    public function __construct(private ClientInterface $client)
     {
-        $this->client = $client;
     }
 
     public function get(string $key, mixed $default = null): mixed
@@ -184,7 +178,6 @@ final class RedisCache implements CacheInterface
     /**
      * Converts iterable to array.
      *
-     * @param iterable $iterable
      *
      * @return array
      */
