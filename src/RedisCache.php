@@ -178,7 +178,6 @@ final class RedisCache implements CacheInterface
     /**
      * Converts iterable to array.
      *
-     *
      * @return array
      */
     private function iterableToArray(iterable $iterable): array
