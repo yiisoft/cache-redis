@@ -15,9 +15,6 @@ use function array_fill_keys;
 use function array_keys;
 use function array_map;
 use function count;
-use function gettype;
-use function is_iterable;
-use function is_string;
 use function iterator_to_array;
 use function serialize;
 use function strpbrk;
@@ -31,20 +28,26 @@ use function unserialize;
 final class RedisCache implements CacheInterface
 {
     /**
+     * @var ClientInterface $client Predis client instance to use.
+     */
+    private ClientInterface $client;
+
+    /**
      * @param ClientInterface $client Predis client instance to use.
      */
-    public function __construct(private ClientInterface $client)
+    public function __construct(ClientInterface $client)
     {
+        $this->client = $client;
     }
 
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         $this->validateKey($key);
         $value = $this->client->get($key);
         return $value === null ? $default : unserialize($value);
     }
 
-    public function set($key, $value, $ttl = null): bool
+    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         $ttl = $this->normalizeTtl($ttl);
 
@@ -63,7 +66,7 @@ final class RedisCache implements CacheInterface
         return $result !== null;
     }
 
-    public function delete($key): bool
+    public function delete(string $key): bool
     {
         return !$this->has($key) || $this->client->del($key) === 1;
     }
@@ -73,27 +76,27 @@ final class RedisCache implements CacheInterface
         return $this->client->flushdb() !== null;
     }
 
-    public function getMultiple($keys, $default = null): iterable
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
+        /** @var string[] $keys */
         $keys = $this->iterableToArray($keys);
         $this->validateKeys($keys);
-        /** @var string[] $keys */
         $values = array_fill_keys($keys, $default);
         /** @var null[]|string[] $valuesFromCache */
         $valuesFromCache = $this->client->mget($keys);
 
         $i = 0;
-        /** @var mixed $default */
-        foreach ($values as $key => $default) {
-            /** @psalm-suppress MixedAssignment */
-            $values[$key] = isset($valuesFromCache[$i]) ? unserialize($valuesFromCache[$i]) : $default;
+
+        /** @psalm-suppress MixedAssignment */
+        foreach ($values as $key => $value) {
+            $values[$key] = isset($valuesFromCache[$i]) ? unserialize($valuesFromCache[$i]) : $value;
             $i++;
         }
 
         return $values;
     }
 
-    public function setMultiple($values, $ttl = null): bool
+    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
         $keys = array_map('\strval', array_keys($values));
@@ -134,7 +137,7 @@ final class RedisCache implements CacheInterface
         return true;
     }
 
-    public function deleteMultiple($keys): bool
+    public function deleteMultiple(iterable $keys): bool
     {
         $keys = $this->iterableToArray($keys);
 
@@ -148,7 +151,7 @@ final class RedisCache implements CacheInterface
         return empty($keys) || $this->client->del($keys) === count($keys);
     }
 
-    public function has($key): bool
+    public function has(string $key): bool
     {
         $this->validateKey($key);
         $ttl = $this->client->ttl($key);
@@ -161,9 +164,9 @@ final class RedisCache implements CacheInterface
      *
      * @param DateInterval|int|string|null $ttl The raw TTL.
      *
-     * @return int TTL value as UNIX timestamp.
+     * @return int|null TTL value as UNIX timestamp.
      */
-    private function normalizeTtl($ttl): ?int
+    private function normalizeTtl(null|int|string|DateInterval $ttl): ?int
     {
         if ($ttl === null) {
             return null;
@@ -179,32 +182,34 @@ final class RedisCache implements CacheInterface
     }
 
     /**
-     * Converts iterable to array. If provided value is not iterable it throws an InvalidArgumentException.
+     * Converts iterable to array.
+     *
+     * @param iterable $iterable
+     *
+     * @return array
      */
-    private function iterableToArray(mixed $iterable): array
+    private function iterableToArray(iterable $iterable): array
     {
-        if (!is_iterable($iterable)) {
-            throw new InvalidArgumentException('Iterable is expected, got ' . gettype($iterable));
-        }
-
         /** @psalm-suppress RedundantCast */
         return $iterable instanceof Traversable ? iterator_to_array($iterable) : (array) $iterable;
     }
 
-    private function validateKey(mixed $key): void
+    private function validateKey(string $key): void
     {
-        if (!is_string($key) || $key === '' || strpbrk($key, '{}()/\@:')) {
+        if ($key === '' || strpbrk($key, '{}()/\@:')) {
             throw new InvalidArgumentException('Invalid key value.');
         }
     }
 
+    /**
+     * @param string[] $keys
+     */
     private function validateKeys(array $keys): void
     {
-        if (empty($keys)) {
+        if ([] === $keys) {
             throw new InvalidArgumentException('Invalid key values.');
         }
 
-        /** @var mixed $key */
         foreach ($keys as $key) {
             $this->validateKey($key);
         }

@@ -30,11 +30,12 @@
         }
     ],
     "require": {
-        "php": "^7.4|^8.0",
+        "php": "^8.0",
         "predis/predis": "^1.1",
-        "psr/simple-cache": "^1.0.1"
+        "psr/simple-cache": "^2.0|^3.0"
     },
     "require-dev": {
+        "maglnet/composer-require-checker": "^4.4",
         "phpunit/phpunit": "^9.5",
         "rector/rector": "^0.14.3",
         "roave/infection-static-analysis-plugin": "^1.16",

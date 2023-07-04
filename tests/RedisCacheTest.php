@@ -19,7 +19,6 @@ use Yiisoft\Cache\Redis\RedisCache;
 
 use function array_keys;
 use function array_map;
-use function gettype;
 use function is_array;
 use function is_object;
 use function time;
@@ -75,7 +74,7 @@ final class RedisCacheTest extends TestCase
      *
      * @throws InvalidArgumentException
      */
-    public function testSet($key, $value): void
+    public function testSet(string $key, mixed $value): void
     {
         for ($i = 0; $i < 2; $i++) {
             $this->assertTrue($this->cache->set($key, $value));
@@ -90,7 +89,7 @@ final class RedisCacheTest extends TestCase
      *
      * @throws InvalidArgumentException
      */
-    public function testSetWithTtl($key, $value): void
+    public function testSetWithTtl(string $key, mixed $value): void
     {
         for ($i = 0; $i < 2; $i++) {
             $this->assertTrue($this->cache->set($key, $value, 3600));
@@ -200,6 +199,9 @@ final class RedisCacheTest extends TestCase
         $this->assertNull($this->cache->get($key));
     }
 
+    /**
+     * @return array
+     */
     public function dataProviderSetMultiple(): array
     {
         return [
@@ -210,6 +212,8 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider dataProviderSetMultiple
+     *
+     * @param int|null $ttl
      *
      * @throws InvalidArgumentException
      */
@@ -226,12 +230,14 @@ final class RedisCacheTest extends TestCase
 
         foreach ($data as $key => $value) {
             $this->assertSameExceptObject($value, $this->cache->get((string) $key));
-            $this->assertSame($ttl ?? -1, $client->ttl($key));
+            $this->assertSame($ttl === null ? -1 : $ttl, $client->ttl($key));
         }
     }
 
     /**
      * @dataProvider dataProviderSetMultiple
+     *
+     * @param int|null $ttl
      *
      * @throws InvalidArgumentException
      */
@@ -336,9 +342,12 @@ final class RedisCacheTest extends TestCase
     /**
      * @dataProvider dataProviderNormalizeTtl
      *
+     * @param mixed $ttl
+     * @param mixed $expectedResult
+     *
      * @throws ReflectionException
      */
-    public function testNormalizeTtl(mixed $ttl, mixed $expectedResult): void
+    public function testNormalizeTtl($ttl, $expectedResult): void
     {
         $reflection = new ReflectionObject($this->cache);
         $method = $reflection->getMethod('normalizeTtl');
@@ -356,11 +365,11 @@ final class RedisCacheTest extends TestCase
                 ['a' => 1, 'b' => 2,],
                 ['a' => 1, 'b' => 2,],
             ],
-            \ArrayIterator::class => [
+            'ArrayIterator' => [
                 ['a' => 1, 'b' => 2,],
                 new ArrayIterator(['a' => 1, 'b' => 2,]),
             ],
-            \IteratorAggregate::class => [
+            'IteratorAggregate' => [
                 ['a' => 1, 'b' => 2,],
                 new class () implements IteratorAggregate {
                     public function getIterator(): ArrayIterator
@@ -382,6 +391,9 @@ final class RedisCacheTest extends TestCase
     /**
      * @dataProvider iterableProvider
      *
+     * @param array $array
+     * @param iterable $iterable
+     *
      * @throws InvalidArgumentException
      */
     public function testValuesAsIterable(array $array, iterable $iterable): void
@@ -394,12 +406,6 @@ final class RedisCacheTest extends TestCase
     public function invalidKeyProvider(): array
     {
         return [
-            'int' => [1],
-            'float' => [1.1],
-            'null' => [null],
-            'bool' => [true],
-            'object' => [new stdClass()],
-            'callable' => [fn () => 'key'],
             'psr-reserved' => ['{}()/\@:'],
             'empty-string' => [''],
         ];
@@ -407,8 +413,10 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
      */
-    public function testGetThrowExceptionForInvalidKey(mixed $key): void
+    public function testGetThrowExceptionForInvalidKey($key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->get($key);
@@ -416,8 +424,10 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
      */
-    public function testSetThrowExceptionForInvalidKey(mixed $key): void
+    public function testSetThrowExceptionForInvalidKey($key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->set($key, 'value');
@@ -425,8 +435,10 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
      */
-    public function testDeleteThrowExceptionForInvalidKey(mixed $key): void
+    public function testDeleteThrowExceptionForInvalidKey($key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->delete($key);
@@ -434,8 +446,10 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
      */
-    public function testGetMultipleThrowExceptionForInvalidKeys(mixed $key): void
+    public function testGetMultipleThrowExceptionForInvalidKeys($key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->getMultiple([$key]);
@@ -443,28 +457,10 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
      */
-    public function testGetMultipleThrowExceptionForInvalidKeysNotIterable(mixed $key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Iterable is expected, got ' . gettype($key));
-        $this->cache->getMultiple($key);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     */
-    public function testSetMultipleThrowExceptionForInvalidKeysNotIterable(mixed $key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Iterable is expected, got ' . gettype($key));
-        $this->cache->setMultiple($key);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     */
-    public function testDeleteMultipleThrowExceptionForInvalidKeys(mixed $key): void
+    public function testDeleteMultipleThrowExceptionForInvalidKeys($key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->deleteMultiple([$key]);
@@ -472,18 +468,10 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
      */
-    public function testDeleteMultipleThrowExceptionForInvalidKeysNotIterable(mixed $key): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Iterable is expected, got ' . gettype($key));
-        $this->cache->deleteMultiple($key);
-    }
-
-    /**
-     * @dataProvider invalidKeyProvider
-     */
-    public function testHasThrowExceptionForInvalidKey(mixed $key): void
+    public function testHasThrowExceptionForInvalidKey($key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->has($key);
@@ -518,7 +506,7 @@ final class RedisCacheTest extends TestCase
         return $data;
     }
 
-    private function assertSameExceptObject($expected, $actual): void
+    private function assertSameExceptObject(mixed $expected, mixed $actual): void
     {
         // Assert for all types.
         $this->assertEquals($expected, $actual);
