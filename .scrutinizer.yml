@@ -24,7 +24,7 @@ build:
 
       tests:
         override:
-          - command: make build && make coverage
+          - command: make build && make create-cluster && make coverage
             on_node: 1
             coverage:
               file: coverage.xml
