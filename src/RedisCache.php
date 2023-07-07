@@ -74,7 +74,7 @@ final class RedisCache implements CacheInterface
     public function get(string $key, mixed $default = null): mixed
     {
         $this->validateKey($key);
-        /** @var null|string $value */
+        /** @var string|null $value */
         $value = $this->client->get($key);
         return $value === null ? $default : unserialize($value);
     }
@@ -155,7 +155,7 @@ final class RedisCache implements CacheInterface
 
         if ($this->isCluster()) {
             foreach ($keys as $key) {
-                /** @var null|string $value */
+                /** @var string|null $value */
                 $value = $this->get($key);
                 if (null !== $value) {
                     /** @psalm-suppress MixedAssignment */
@@ -205,7 +205,7 @@ final class RedisCache implements CacheInterface
         $results = [];
         if ($this->isCluster()) {
             foreach ($serializeValues as $key => $value) {
-                $this->set((string)$key, $value, $this->isInfinityTtl($ttl)?null:$ttl);
+                $this->set((string)$key, $value, $this->isInfinityTtl($ttl) ? null : $ttl);
             }
         } else {
             if ($this->isInfinityTtl($ttl)) {
@@ -220,7 +220,7 @@ final class RedisCache implements CacheInterface
                 $this->client->expire($key, (int)$ttl);
             }
 
-            /** @var null|array $results */
+            /** @var array|null $results */
             $results = $this->client->exec();
         }
 
