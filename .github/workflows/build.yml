@@ -33,8 +33,5 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Build
-        run: make build
-
       - name: Run tests with phpunit
         run: make test v=${{ matrix.php }}
