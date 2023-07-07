@@ -20,7 +20,7 @@ build:
       dependencies:
         override:
           - make build
-          - make test80
+          - make test v=8.1
 
       tests:
         override:

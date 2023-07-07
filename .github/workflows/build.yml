@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ 80, 81 ]
+        php: [ '8.0', '8.1' ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -37,4 +37,4 @@ jobs:
         run: make build
 
       - name: Run tests with phpunit
-        run: make test${{ matrix.php }}
+        run: make test v=${{ matrix.php }}
