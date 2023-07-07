@@ -1,8 +1,11 @@
-FROM --platform=linux/amd64 php:8.0.28-fpm-alpine
+# Important! Do not use this image in production!
+
+ARG PHP_VERSION
+FROM --platform=linux/amd64 php:${PHP_VERSION}-cli-alpine
 
 RUN apk add unzip zlib-dev libzip-dev autoconf g++ make
 
-RUN docker-php-ext-install zip
+RUN docker-php-ext-install zip opcache
 RUN pecl install pcov-1.0.11
 RUN docker-php-ext-enable pcov
 

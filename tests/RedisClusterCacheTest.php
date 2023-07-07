@@ -279,39 +279,6 @@ final class RedisClusterCacheTest extends TestCase
     /**
      * @return array
      */
-    public function iterableProvider(): array
-    {
-        return [
-            'array' => [
-                ['a' => 1, 'b' => 2,],
-                ['a' => 1, 'b' => 2,],
-            ],
-            'ArrayIterator' => [
-                ['a' => 1, 'b' => 2,],
-                new ArrayIterator(['a' => 1, 'b' => 2,]),
-            ],
-            'IteratorAggregate' => [
-                ['a' => 1, 'b' => 2,],
-                new class () implements IteratorAggregate {
-                    public function getIterator(): ArrayIterator
-                    {
-                        return new ArrayIterator(['a' => 1, 'b' => 2,]);
-                    }
-                },
-            ],
-            'generator' => [
-                ['a' => 1, 'b' => 2,],
-                (static function () {
-                    yield 'a' => 1;
-                    yield 'b' => 2;
-                })(),
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
     public function invalidKeyProvider(): array
     {
         return [
@@ -447,4 +414,6 @@ final class RedisClusterCacheTest extends TestCase
             }
         }
     }
+
+
 }

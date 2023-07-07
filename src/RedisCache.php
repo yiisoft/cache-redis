@@ -54,6 +54,7 @@ final class RedisCache implements CacheInterface
         foreach ($this->connections as $connection) {
             /** @var StreamConnection $connection */
             $cluster = (new Client($connection->getParameters()))->info('Cluster');
+            /** @psalm-suppress MixedArrayAccess */
             if (isset($cluster['Cluster']['cluster_enabled']) && 1 === (int)$cluster['Cluster']['cluster_enabled']) {
                 return true;
             }
@@ -73,6 +74,7 @@ final class RedisCache implements CacheInterface
     public function get(string $key, mixed $default = null): mixed
     {
         $this->validateKey($key);
+        /** @var null|string $value */
         $value = $this->client->get($key);
         return $value === null ? $default : unserialize($value);
     }
@@ -201,6 +203,7 @@ final class RedisCache implements CacheInterface
             $this->client->expire($key, (int)$ttl);
         }
 
+        /** @var null|array $results */
         $results = $this->client->exec();
 
         return !in_array(null, (array)$results, true);
@@ -238,6 +241,7 @@ final class RedisCache implements CacheInterface
     public function has(string $key): bool
     {
         $this->validateKey($key);
+        /** @var int $ttl */
         $ttl = $this->client->ttl($key);
         /** "-1" - if the key exists but has no associated expire {@see https://redis.io/commands/ttl}. */
         return $ttl > 0 || $ttl === -1;
