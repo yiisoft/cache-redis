@@ -214,8 +214,6 @@ final class RedisCacheTest extends TestCase
     /**
      * @dataProvider dataProviderSetMultiple
      *
-     * @param int|null $ttl
-     *
      * @throws InvalidArgumentException
      */
     public function testSetMultiple(?int $ttl): void
@@ -231,14 +229,12 @@ final class RedisCacheTest extends TestCase
 
         foreach ($data as $key => $value) {
             $this->assertSameExceptObject($value, $this->cache->get((string) $key));
-            $this->assertSame($ttl === null ? -1 : $ttl, $client->ttl($key));
+            $this->assertSame($ttl ?? -1, $client->ttl($key));
         }
     }
 
     /**
      * @dataProvider dataProviderSetMultiple
-     *
-     * @param int|null $ttl
      *
      * @throws InvalidArgumentException
      */
@@ -343,12 +339,9 @@ final class RedisCacheTest extends TestCase
     /**
      * @dataProvider dataProviderNormalizeTtl
      *
-     * @param mixed $ttl
-     * @param mixed $expectedResult
-     *
      * @throws ReflectionException
      */
-    public function testNormalizeTtl($ttl, $expectedResult): void
+    public function testNormalizeTtl(mixed $ttl, mixed $expectedResult): void
     {
         $reflection = new ReflectionObject($this->cache);
         $method = $reflection->getMethod('normalizeTtl');
@@ -392,9 +385,6 @@ final class RedisCacheTest extends TestCase
     /**
      * @dataProvider iterableProvider
      *
-     * @param array $array
-     * @param iterable $iterable
-     *
      * @throws InvalidArgumentException
      */
     public function testValuesAsIterable(array $array, iterable $iterable): void
@@ -414,10 +404,8 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testGetThrowExceptionForInvalidKey($key): void
+    public function testGetThrowExceptionForInvalidKey(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->get($key);
@@ -425,10 +413,8 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testSetThrowExceptionForInvalidKey($key): void
+    public function testSetThrowExceptionForInvalidKey(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->set($key, 'value');
@@ -436,10 +422,8 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testDeleteThrowExceptionForInvalidKey($key): void
+    public function testDeleteThrowExceptionForInvalidKey(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->delete($key);
@@ -447,10 +431,8 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testGetMultipleThrowExceptionForInvalidKeys($key): void
+    public function testGetMultipleThrowExceptionForInvalidKeys(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->getMultiple([$key]);
@@ -458,10 +440,8 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testDeleteMultipleThrowExceptionForInvalidKeys($key): void
+    public function testDeleteMultipleThrowExceptionForInvalidKeys(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->deleteMultiple([$key]);
@@ -469,10 +449,8 @@ final class RedisCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testHasThrowExceptionForInvalidKey($key): void
+    public function testHasThrowExceptionForInvalidKey(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->has($key);
