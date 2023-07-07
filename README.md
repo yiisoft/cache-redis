@@ -81,6 +81,8 @@ This package can be used as a cache handler for the [Yii Caching Library](https:
 
 ## Testing
 
+> The tests use a connection to a running Redis cluster. If you are not using Docker, you must start the cluster yourself before running the tests.
+
 ### Unit testing
 
 The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
@@ -111,25 +113,22 @@ The code is statically analyzed with [Psalm](https://psalm.dev/). To run static 
 ### Prepare
 
 ```bash
-make build && make create-cluster
+# {{ v }} = 8.0, 8.1, 8.2. Default PHP 8.1
+make build v=8.1
 ```
 
 ### Unit testing
 
 ```bash
-make test
-```
-
-or run test with another PHP version
-
-```bash
-make test80
+# {{ v }} = 8.0, 8.1, 8.2. Default PHP 8.1
+make test v=8.1
 ```
 
 ### Mutation testing
 
 ```bash
-make mutation-test v=80
+# {{ v }} = 8.0, 8.1, 8.2. Default PHP 8.1
+make mutation-test v=8.0
 ```
 
 ## License

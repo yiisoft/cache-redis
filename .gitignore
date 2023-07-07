@@ -30,6 +30,3 @@ phpunit.phar
 .phpunit.result.cache
 # phpunit coverage report
 coverage.xml
-
-# redis data
-/tests/docker/redis/data
