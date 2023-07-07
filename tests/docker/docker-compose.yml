@@ -23,7 +23,6 @@ services:
       - "16380:16380"
     volumes:
       - ./redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
-      - ./redis/data/single/:/data/
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     networks: *network
 
@@ -37,7 +36,6 @@ services:
       - "16381:16381"
     volumes:
       - ./redis/conf/redis1.conf:/usr/local/etc/redis/redis.conf
-      - ./redis/data/redis1/:/data/
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     networks:
       cache-redis-network:
@@ -53,7 +51,6 @@ services:
         - "16382:16382"
       volumes:
         - ./redis/conf/redis2.conf:/usr/local/etc/redis/redis.conf
-        - ./redis/data/redis2/:/data/
       command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
       networks:
         cache-redis-network:
@@ -69,7 +66,6 @@ services:
         - "16383:16383"
       volumes:
         - ./redis/conf/redis3.conf:/usr/local/etc/redis/redis.conf
-        - ./redis/data/redis3/:/data/
       command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
       networks:
         cache-redis-network:
@@ -85,7 +81,6 @@ services:
         - "16384:16384"
       volumes:
         - ./redis/conf/redis4.conf:/usr/local/etc/redis/redis.conf
-        - ./redis/data/redis4/:/data/
       command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
       networks:
         cache-redis-network:
@@ -101,7 +96,6 @@ services:
         - "16385:16385"
       volumes:
         - ./redis/conf/redis5.conf:/usr/local/etc/redis/redis.conf
-        - ./redis/data/redis5/:/data/
       command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
       networks:
         cache-redis-network:
@@ -117,7 +111,6 @@ services:
         - "16386:16386"
       volumes:
         - ./redis/conf/redis6.conf:/usr/local/etc/redis/redis.conf
-        - ./redis/data/redis6/:/data/
       command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
       networks:
         cache-redis-network:
