@@ -17,7 +17,7 @@ test:			## Run tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
 	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml build --pull cache-redis-php
 	make create-cluster
 	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml run cache-redis-php vendor/bin/phpunit --colors=always
-	docker-compose -f tests/docker/docker-compose.yml down
+	make down
 
 create-cluster:		## Create Redis cluster
 	docker exec redis1 sh -c "redis-cli -p 6381 -a Password --cluster create 172.20.128.2:6381 172.20.128.3:6382 172.20.128.4:6383 172.20.128.5:6384 172.20.128.6:6385 172.20.128.7:6386 --cluster-replicas 1 --no-auth-warning --cluster-yes"

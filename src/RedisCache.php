@@ -152,15 +152,26 @@ final class RedisCache implements CacheInterface
         $keys = $this->iterableToArray($keys);
         $this->validateKeys($keys);
         $values = array_fill_keys($keys, $default);
-        /** @var null[]|string[] $valuesFromCache */
-        $valuesFromCache = $this->client->mget($keys);
 
-        $i = 0;
+        if ($this->isCluster()) {
+            foreach ($keys as $key) {
+                /** @var null|string $value */
+                $value = $this->get($key);
+                if (null !== $value) {
+                    /** @psalm-suppress MixedAssignment */
+                    $values[$key] = unserialize($value);
+                }
+            }
+        } else {
+            /** @var null[]|string[] $valuesFromCache */
+            $valuesFromCache = $this->client->mget($keys);
 
-        /** @psalm-suppress MixedAssignment */
-        foreach ($values as $key => $value) {
-            $values[$key] = isset($valuesFromCache[$i]) ? unserialize($valuesFromCache[$i]) : $value;
-            $i++;
+            $i = 0;
+            /** @psalm-suppress MixedAssignment */
+            foreach ($values as $key => $value) {
+                $values[$key] = isset($valuesFromCache[$i]) ? unserialize($valuesFromCache[$i]) : $value;
+                $i++;
+            }
         }
 
         return $values;
@@ -191,20 +202,27 @@ final class RedisCache implements CacheInterface
             $serializeValues[$key] = serialize($value);
         }
 
-        if ($this->isInfinityTtl($ttl)) {
+        $results = [];
+        if ($this->isCluster()) {
+            foreach ($serializeValues as $key => $value) {
+                $this->set((string)$key, $value, $this->isInfinityTtl($ttl)?null:$ttl);
+            }
+        } else {
+            if ($this->isInfinityTtl($ttl)) {
+                $this->client->mset($serializeValues);
+                return true;
+            }
+
+            $this->client->multi();
             $this->client->mset($serializeValues);
-            return true;
+
+            foreach ($keys as $key) {
+                $this->client->expire($key, (int)$ttl);
+            }
+
+            /** @var null|array $results */
+            $results = $this->client->exec();
         }
-
-        $this->client->multi();
-        $this->client->mset($serializeValues);
-
-        foreach ($keys as $key) {
-            $this->client->expire($key, (int)$ttl);
-        }
-
-        /** @var null|array $results */
-        $results = $this->client->exec();
 
         return !in_array(null, (array)$results, true);
     }

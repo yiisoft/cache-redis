@@ -415,5 +415,51 @@ final class RedisClusterCacheTest extends TestCase
         }
     }
 
+    /**
+     * @return array
+     */
+    public function iterableProvider(): array
+    {
+        return [
+            'array' => [
+                ['aa' => 1, 'bb' => 2,],
+                ['aa' => 1, 'bb' => 2,],
+            ],
+            'ArrayIterator' => [
+                ['aa' => 1, 'bb' => 2,],
+                new ArrayIterator(['aa' => 1, 'bb' => 2,]),
+            ],
+            'IteratorAggregate' => [
+                ['aa' => 1, 'bb' => 2,],
+                new class () implements IteratorAggregate {
+                    public function getIterator(): ArrayIterator
+                    {
+                        return new ArrayIterator(['aa' => 1, 'bb' => 2,]);
+                    }
+                },
+            ],
+            'generator' => [
+                ['aa' => 1, 'bb' => 2,],
+                (static function () {
+                    yield 'aa' => 1;
+                    yield 'bb' => 2;
+                })(),
+            ],
+        ];
+    }
 
+    /**
+     * @dataProvider iterableProvider
+     *
+     * @param array $array
+     * @param iterable $iterable
+     *
+     * @throws InvalidArgumentException
+     */
+    public function testValuesAsIterable(array $array, iterable $iterable): void
+    {
+        $this->cache->setMultiple($iterable);
+
+        $this->assertSameExceptObject($array, $this->cache->getMultiple(array_keys($array)));
+    }
 }
