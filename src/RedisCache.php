@@ -161,14 +161,6 @@ final class RedisCache implements CacheInterface
         return $values;
     }
 
-    /**
-     * @param iterable $values
-     * @param DateInterval|int|null $ttl
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return bool
-     */
     public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
