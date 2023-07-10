@@ -130,14 +130,6 @@ final class RedisCache implements CacheInterface
         return $this->client->flushdb() !== null;
     }
 
-    /**
-     * @param iterable<string> $keys
-     * @param mixed $default
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return iterable<string, mixed>
-     */
     public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         /** @var string[] $keys */
