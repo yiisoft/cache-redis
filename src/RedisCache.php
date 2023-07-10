@@ -31,7 +31,7 @@ use function unserialize;
 final class RedisCache implements CacheInterface
 {
     /**
-     * @var array<ConnectionInterface>|ConnectionInterface $connections Predis connections instance to use
+     * @var array<ConnectionInterface>|ConnectionInterface $connections Predis connection instances to use.
      */
     private ConnectionInterface|array $connections;
 
