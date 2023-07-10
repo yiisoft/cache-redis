@@ -249,13 +249,6 @@ final class RedisCache implements CacheInterface
         return empty($keys) || $this->client->del($keys) === count($keys);
     }
 
-    /**
-     * @param string $key
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return bool
-     */
     public function has(string $key): bool
     {
         $this->validateKey($key);
