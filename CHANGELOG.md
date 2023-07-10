@@ -1,5 +1,9 @@
 # Yii Redis Cache Change Log
 
+## 2.0.1 under development
+
+- no changes in this release.
+
 ## 2.0.0 July 10, 2023
 
 - Chg #5: Raise the minimum `psr/simple-cache` version to `^2.0|^3.0` and the minimum PHP version to `^8.0` (@dehbka)
