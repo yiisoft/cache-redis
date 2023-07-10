@@ -219,13 +219,6 @@ final class RedisCache implements CacheInterface
         return !in_array(null, (array)$results, true);
     }
 
-    /**
-     * @param iterable $keys
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return bool
-     */
     public function deleteMultiple(iterable $keys): bool
     {
         $keys = $this->iterableToArray($keys);
