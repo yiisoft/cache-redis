@@ -79,6 +79,59 @@ To work with values in a more efficient manner, batch operations should be used:
 
 This package can be used as a cache handler for the [Yii Caching Library](https://github.com/yiisoft/cache).
 
+## Redis cluster supported
+
+The package implements [Redis cluster](https://redis.io/docs/management/scaling/) support via `Predis` package.
+
+For example, if your cluster configuration has three master nodes and three slave nodes, your client configuration might look like this:
+
+```php
+$client = new \Predis\Client([
+        ['host' => 'redis-node-1', 'port' => 'redis-node-port-1',],
+        ['host' => 'redis-node-2', 'port' => 'redis-node-port-2',],
+        ['host' => 'redis-node-3', 'port' => 'redis-node-port-3',],
+        ['host' => 'redis-node-4', 'port' => 'redis-node-port-4',],
+        ['host' => 'redis-node-5', 'port' => 'redis-node-port-5',],
+        ['host' => 'redis-node-6', 'port' => 'redis-node-port-6',],
+    ],
+    [
+        'cluster' => 'redis',
+        'parameters' => [
+            'password' => 'Password',
+        ],
+    ]
+);
+$cache = new \Yiisoft\Cache\Redis\RedisCache($client);
+```
+Predis will route commands on its own when specifying Redis nodes in the cluster to the appropriate nodes depending on the keys that are specified in the commands.
+
+You can implement `\Predis\Distribution\DistributorInterface` to create their own distributors used by the client to distribute keys among a cluster of servers.
+
+Then your config might look like this:
+
+```php
+$client = new \Predis\Client([
+        ['host' => 'redis-node-1', 'port' => 'redis-node-port-1',],
+        ['host' => 'redis-node-2', 'port' => 'redis-node-port-2',],
+        ['host' => 'redis-node-3', 'port' => 'redis-node-port-3',],
+        ['host' => 'redis-node-4', 'port' => 'redis-node-port-4',],
+        ['host' => 'redis-node-5', 'port' => 'redis-node-port-5',],
+        ['host' => 'redis-node-6', 'port' => 'redis-node-port-6',],
+    ],
+    [
+        'cluster' => static function () {
+            $distributor = new \CustomDistributor(); // Your custom distributor
+            $strategy = new \Predis\Cluster\PredisStrategy($distributor);
+
+            return new \Predis\Connection\Cluster\PredisCluster($strategy);
+        },
+        'parameters' => [
+            'password' => 'Password',
+        ],
+    ]
+);
+```
+
 ## Testing
 
 > The tests use a connection to a running Redis cluster. If you are not using Docker, you must start the cluster yourself before running the tests.

@@ -83,14 +83,6 @@ final class RedisClusterCacheTest extends TestCase
     }
 
     /**
-     * Check redis cluster connection
-     */
-    public function testIsCLuster(): void
-    {
-        $this->assertTrue($this->cache->isCluster());
-    }
-
-    /**
      * @dataProvider dataProvider
      *
      * @param string $key

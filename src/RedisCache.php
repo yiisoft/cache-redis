@@ -48,7 +48,7 @@ final class RedisCache implements CacheInterface
      *
      * @return bool Whether Predis cluster is used.
      */
-    public function isCluster(): bool
+    private function isCluster(): bool
     {
         /** @psalm-suppress MixedAssignment, PossibleRawObjectIteration */
         foreach ($this->connections as $connection) {
@@ -71,15 +71,6 @@ final class RedisCache implements CacheInterface
         return $value === null ? $default : unserialize($value);
     }
 
-    /**
-     * @param string $key
-     * @param mixed $value
-     * @param DateInterval|int|null $ttl
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return bool
-     */
     public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         $ttl = $this->normalizeTtl($ttl);
@@ -98,13 +89,6 @@ final class RedisCache implements CacheInterface
         return $result !== null;
     }
 
-    /**
-     * @param string $key
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return bool
-     */
     public function delete(string $key): bool
     {
         return !$this->has($key) || $this->client->del($key) === 1;
