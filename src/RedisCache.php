@@ -46,7 +46,7 @@ final class RedisCache implements CacheInterface
     /**
      * Returns whether Predis cluster is used.
      *
-     * @return bool
+     * @return bool Whether Predis cluster is used.
      */
     public function isCluster(): bool
     {
