@@ -63,14 +63,6 @@ final class RedisCache implements CacheInterface
         return false;
     }
 
-    /**
-     * @param string $key
-     * @param mixed|null $default
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return mixed
-     */
     public function get(string $key, mixed $default = null): mixed
     {
         $this->validateKey($key);
