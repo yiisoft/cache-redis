@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  cache-redis-php:
+    container_name: cache-redis-php
+    hostname: cache-redis-php
+    build:
+      context: ../..
+      dockerfile: tests/docker/php/Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.1}
+    volumes:
+      - ../runtime/.composer80:/root/.composer
+      - ../..:/var/www
+    networks: &network
+      - cache-redis-network
+
+  redis-single:
+    image: redis:7.0.4-alpine
+    container_name: redis-single
+    ports:
+      - "6380:6380"
+      - "16380:16380"
+    volumes:
+      - ./redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    networks: *network
+
+  redis1:
+    image: redis:7.0.4-alpine
+    container_name: redis1
+    environment:
+      - TZ=UTC
+    ports:
+      - "6381:6381"
+      - "16381:16381"
+    volumes:
+      - ./redis/conf/redis1.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    networks:
+      cache-redis-network:
+        ipv4_address: 172.20.128.2
+
+  redis2:
+      image: redis:7.0.4-alpine
+      container_name: redis2
+      environment:
+        - TZ=UTC
+      ports:
+        - "6382:6382"
+        - "16382:16382"
+      volumes:
+        - ./redis/conf/redis2.conf:/usr/local/etc/redis/redis.conf
+      command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+      networks:
+        cache-redis-network:
+          ipv4_address: 172.20.128.3
+
+  redis3:
+      image: redis:7.0.4-alpine
+      container_name: redis3
+      environment:
+        - TZ=UTC
+      ports:
+        - "6383:6383"
+        - "16383:16383"
+      volumes:
+        - ./redis/conf/redis3.conf:/usr/local/etc/redis/redis.conf
+      command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+      networks:
+        cache-redis-network:
+          ipv4_address: 172.20.128.4
+
+  redis4:
+      image: redis:7.0.4-alpine
+      container_name: redis4
+      environment:
+        - TZ=UTC
+      ports:
+        - "6384:6384"
+        - "16384:16384"
+      volumes:
+        - ./redis/conf/redis4.conf:/usr/local/etc/redis/redis.conf
+      command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+      networks:
+        cache-redis-network:
+          ipv4_address: 172.20.128.5
+
+  redis5:
+      image: redis:7.0.4-alpine
+      container_name: redis5
+      environment:
+        - TZ=UTC
+      ports:
+        - "6385:6385"
+        - "16385:16385"
+      volumes:
+        - ./redis/conf/redis5.conf:/usr/local/etc/redis/redis.conf
+      command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+      networks:
+        cache-redis-network:
+          ipv4_address: 172.20.128.6
+
+  redis6:
+      image: redis:7.0.4-alpine
+      container_name: redis6
+      environment:
+        - TZ=UTC
+      ports:
+        - "6386:6386"
+        - "16386:16386"
+      volumes:
+        - ./redis/conf/redis6.conf:/usr/local/etc/redis/redis.conf
+      command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+      networks:
+        cache-redis-network:
+          ipv4_address: 172.20.128.7
+
+networks:
+  cache-redis-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

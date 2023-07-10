@@ -6,7 +6,10 @@ namespace Yiisoft\Cache\Redis;
 
 use DateInterval;
 use DateTime;
+use Predis\Client;
 use Predis\ClientInterface;
+use Predis\Connection\ConnectionInterface;
+use Predis\Connection\StreamConnection;
 use Predis\Response\Status;
 use Psr\SimpleCache\CacheInterface;
 use Traversable;
@@ -28,15 +31,42 @@ use function unserialize;
 final class RedisCache implements CacheInterface
 {
     /**
+     * @var array<ConnectionInterface>|ConnectionInterface $connections Predis connection instances to use.
+     */
+    private ConnectionInterface|array $connections;
+
+    /**
      * @param ClientInterface $client Predis client instance to use.
      */
     public function __construct(private ClientInterface $client)
     {
+        $this->connections = $this->client->getConnection();
+    }
+
+    /**
+     * Returns whether Predis cluster is used.
+     *
+     * @return bool Whether Predis cluster is used.
+     */
+    private function isCluster(): bool
+    {
+        /** @psalm-suppress MixedAssignment, PossibleRawObjectIteration */
+        foreach ($this->connections as $connection) {
+            /** @var StreamConnection $connection */
+            $cluster = (new Client($connection->getParameters()))->info('Cluster');
+            /** @psalm-suppress MixedArrayAccess */
+            if (isset($cluster['Cluster']['cluster_enabled']) && 1 === (int)$cluster['Cluster']['cluster_enabled']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function get(string $key, mixed $default = null): mixed
     {
         $this->validateKey($key);
+        /** @var string|null $value */
         $value = $this->client->get($key);
         return $value === null ? $default : unserialize($value);
     }
@@ -54,8 +84,7 @@ final class RedisCache implements CacheInterface
         /** @var Status|null $result */
         $result = $this->isInfinityTtl($ttl)
             ? $this->client->set($key, serialize($value))
-            : $this->client->set($key, serialize($value), 'EX', $ttl)
-        ;
+            : $this->client->set($key, serialize($value), 'EX', $ttl);
 
         return $result !== null;
     }
@@ -65,8 +94,23 @@ final class RedisCache implements CacheInterface
         return !$this->has($key) || $this->client->del($key) === 1;
     }
 
+    /**
+     * @inheritDoc
+     *
+     * If a cluster is used, all nodes will be cleared.
+     */
     public function clear(): bool
     {
+        if ($this->isCluster()) {
+            /** @psalm-suppress MixedAssignment, PossibleRawObjectIteration */
+            foreach ($this->connections as $connection) {
+                /** @var StreamConnection $connection */
+                $client = new Client($connection->getParameters());
+                $client->flushdb();
+            }
+            return true;
+        }
+
         return $this->client->flushdb() !== null;
     }
 
@@ -76,15 +120,26 @@ final class RedisCache implements CacheInterface
         $keys = $this->iterableToArray($keys);
         $this->validateKeys($keys);
         $values = array_fill_keys($keys, $default);
-        /** @var null[]|string[] $valuesFromCache */
-        $valuesFromCache = $this->client->mget($keys);
 
-        $i = 0;
+        if ($this->isCluster()) {
+            foreach ($keys as $key) {
+                /** @var string|null $value */
+                $value = $this->get($key);
+                if (null !== $value) {
+                    /** @psalm-suppress MixedAssignment */
+                    $values[$key] = unserialize($value);
+                }
+            }
+        } else {
+            /** @var null[]|string[] $valuesFromCache */
+            $valuesFromCache = $this->client->mget($keys);
 
-        /** @psalm-suppress MixedAssignment */
-        foreach ($values as $key => $value) {
-            $values[$key] = isset($valuesFromCache[$i]) ? unserialize($valuesFromCache[$i]) : $value;
-            $i++;
+            $i = 0;
+            /** @psalm-suppress MixedAssignment */
+            foreach ($values as $key => $value) {
+                $values[$key] = isset($valuesFromCache[$i]) ? unserialize($valuesFromCache[$i]) : $value;
+                $i++;
+            }
         }
 
         return $values;
@@ -107,28 +162,29 @@ final class RedisCache implements CacheInterface
             $serializeValues[$key] = serialize($value);
         }
 
-        if ($this->isInfinityTtl($ttl)) {
-            $this->client->mset($serializeValues);
-            return true;
-        }
-
-        $this->client->multi();
-        $this->client->mset($serializeValues);
-
-        foreach ($keys as $key) {
-            $this->client->expire($key, $ttl);
-        }
-
-        $results = $this->client->exec();
-
-        /** @var Status|null $result */
-        foreach ((array) $results as $result) {
-            if ($result === null) {
-                return false;
+        $results = [];
+        if ($this->isCluster()) {
+            foreach ($serializeValues as $key => $value) {
+                $this->set((string)$key, $value, $this->isInfinityTtl($ttl) ? null : $ttl);
             }
+        } else {
+            if ($this->isInfinityTtl($ttl)) {
+                $this->client->mset($serializeValues);
+                return true;
+            }
+
+            $this->client->multi();
+            $this->client->mset($serializeValues);
+
+            foreach ($keys as $key) {
+                $this->client->expire($key, (int)$ttl);
+            }
+
+            /** @var array|null $results */
+            $results = $this->client->exec();
         }
 
-        return true;
+        return !in_array(null, (array)$results, true);
     }
 
     public function deleteMultiple(iterable $keys): bool
@@ -142,12 +198,14 @@ final class RedisCache implements CacheInterface
             }
         }
 
+        /** @psalm-suppress MixedArgumentTypeCoercion */
         return empty($keys) || $this->client->del($keys) === count($keys);
     }
 
     public function has(string $key): bool
     {
         $this->validateKey($key);
+        /** @var int $ttl */
         $ttl = $this->client->ttl($key);
         /** "-1" - if the key exists but has no associated expire {@see https://redis.io/commands/ttl}. */
         return $ttl > 0 || $ttl === -1;
@@ -186,6 +244,11 @@ final class RedisCache implements CacheInterface
         return $iterable instanceof Traversable ? iterator_to_array($iterable) : (array) $iterable;
     }
 
+    /**
+     * @param string $key
+     *
+     * @throws InvalidArgumentException
+     */
     private function validateKey(string $key): void
     {
         if ($key === '' || strpbrk($key, '{}()/\@:')) {
@@ -195,6 +258,8 @@ final class RedisCache implements CacheInterface
 
     /**
      * @param string[] $keys
+     *
+     * @throws InvalidArgumentException
      */
     private function validateKeys(array $keys): void
     {
@@ -207,11 +272,21 @@ final class RedisCache implements CacheInterface
         }
     }
 
+    /**
+     * @param int|null $ttl
+     *
+     * @return bool
+     */
     private function isExpiredTtl(?int $ttl): bool
     {
         return $ttl !== null && $ttl <= 0;
     }
 
+    /**
+     * @param int|null $ttl
+     *
+     * @return bool
+     */
     private function isInfinityTtl(?int $ttl): bool
     {
         return $ttl === null;
