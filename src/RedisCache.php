@@ -119,9 +119,9 @@ final class RedisCache implements CacheInterface
     }
 
     /**
-     * If a cluster is used, all nodes will be cleared
+     * @inheritDoc
      *
-     * @return bool
+     * If a cluster is used, all nodes will be cleared.
      */
     public function clear(): bool
     {
