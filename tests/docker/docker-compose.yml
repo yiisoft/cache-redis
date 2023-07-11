@@ -10,7 +10,7 @@ services:
       args:
         PHP_VERSION: ${PHP_VERSION:-8.1}
     volumes:
-      - ../runtime/.composer80:/root/.composer
+      - ../runtime/.composer:/root/.composer
       - ../..:/var/www
     networks: &network
       - cache-redis-network
