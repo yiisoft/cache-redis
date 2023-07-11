@@ -245,8 +245,6 @@ final class RedisCache implements CacheInterface
     }
 
     /**
-     * @param string $key
-     *
      * @throws InvalidArgumentException
      */
     private function validateKey(string $key): void
@@ -273,8 +271,6 @@ final class RedisCache implements CacheInterface
     }
 
     /**
-     * @param int|null $ttl
-     *
      * @return bool
      */
     private function isExpiredTtl(?int $ttl): bool
@@ -283,8 +279,6 @@ final class RedisCache implements CacheInterface
     }
 
     /**
-     * @param int|null $ttl
-     *
      * @return bool
      */
     private function isInfinityTtl(?int $ttl): bool

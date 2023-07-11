@@ -85,8 +85,6 @@ final class RedisClusterCacheTest extends TestCase
     /**
      * @dataProvider dataProvider
      *
-     * @param string $key
-     * @param mixed $value
      *
      * @throws InvalidArgumentException
      */
@@ -100,8 +98,6 @@ final class RedisClusterCacheTest extends TestCase
     /**
      * @dataProvider dataProvider
      *
-     * @param string $key
-     * @param mixed $value
      *
      * @throws InvalidArgumentException
      */
@@ -252,12 +248,10 @@ final class RedisClusterCacheTest extends TestCase
     /**
      * @dataProvider dataProviderNormalizeTtl
      *
-     * @param mixed $ttl
-     * @param mixed $expectedResult
      *
      * @throws ReflectionException
      */
-    public function testNormalizeTtl($ttl, $expectedResult): void
+    public function testNormalizeTtl(mixed $ttl, mixed $expectedResult): void
     {
         $reflection = new ReflectionObject($this->cache);
         $method = $reflection->getMethod('normalizeTtl');
@@ -281,10 +275,8 @@ final class RedisClusterCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testGetThrowExceptionForInvalidKey($key): void
+    public function testGetThrowExceptionForInvalidKey(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->get($key);
@@ -292,10 +284,8 @@ final class RedisClusterCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testHasThrowExceptionForInvalidKey($key): void
+    public function testHasThrowExceptionForInvalidKey(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->has($key);
@@ -303,10 +293,8 @@ final class RedisClusterCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testDeleteThrowExceptionForInvalidKey($key): void
+    public function testDeleteThrowExceptionForInvalidKey(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->delete($key);
@@ -314,10 +302,8 @@ final class RedisClusterCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testGetMultipleThrowExceptionForInvalidKeys($key): void
+    public function testGetMultipleThrowExceptionForInvalidKeys(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->getMultiple([$key]);
@@ -325,10 +311,8 @@ final class RedisClusterCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testDeleteMultipleThrowExceptionForInvalidKeys($key): void
+    public function testDeleteMultipleThrowExceptionForInvalidKeys(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->deleteMultiple([$key]);
@@ -353,8 +337,6 @@ final class RedisClusterCacheTest extends TestCase
     }
 
     /**
-     * @param array $values
-     *
      * @return array
      */
     private function prepareKeysOfValues(array $values): array
@@ -377,10 +359,6 @@ final class RedisClusterCacheTest extends TestCase
         return $data;
     }
 
-    /**
-     * @param mixed $expected
-     * @param mixed $actual
-     */
     private function assertSameExceptObject(mixed $expected, mixed $actual): void
     {
         // Assert for all types.
@@ -443,8 +421,6 @@ final class RedisClusterCacheTest extends TestCase
     /**
      * @dataProvider iterableProvider
      *
-     * @param array $array
-     * @param iterable $iterable
      *
      * @throws InvalidArgumentException
      */
