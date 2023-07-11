@@ -85,7 +85,6 @@ final class RedisClusterCacheTest extends TestCase
     /**
      * @dataProvider dataProvider
      *
-     *
      * @throws InvalidArgumentException
      */
     public function testSet(string $key, mixed $value): void
@@ -97,7 +96,6 @@ final class RedisClusterCacheTest extends TestCase
 
     /**
      * @dataProvider dataProvider
-     *
      *
      * @throws InvalidArgumentException
      */
@@ -247,7 +245,6 @@ final class RedisClusterCacheTest extends TestCase
 
     /**
      * @dataProvider dataProviderNormalizeTtl
-     *
      *
      * @throws ReflectionException
      */
@@ -420,7 +417,6 @@ final class RedisClusterCacheTest extends TestCase
 
     /**
      * @dataProvider iterableProvider
-     *
      *
      * @throws InvalidArgumentException
      */
