@@ -27,7 +27,7 @@ implements [PSR-16](https://www.php-fig.org/psr/psr-16/) cache.
 The package could be installed with composer:
 
 ```shell
-composer require yiisoft/cache-redis --prefer-dist
+composer require yiisoft/cache-redis
 ```
 
 ## General usage
