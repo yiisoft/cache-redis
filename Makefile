@@ -28,7 +28,7 @@ connect-cluster:	## Connect to Redis cluster
 mutation-test:		## Run mutation tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
 	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml build --pull cache-redis-php
 	make create-cluster
-	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml run cache-redis-php php -dpcov.enabled=1 -dpcov.directory=. vendor/bin/roave-infection-static-analysis-plugin -j2 --ignore-msi-with-no-mutations --only-covered
+	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml run cache-redis-php php -dpcov.enabled=1 -dpcov.directory=. vendor/bin/roave-infection-static-analysis-plugin --threads=2 --ignore-msi-with-no-mutations --only-covered
 	make down
 
 coverage:		## Run code coverage. Params: {{ v=8.1 }}. Default latest PHP 8.1
