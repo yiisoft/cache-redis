@@ -2,7 +2,7 @@
 
 ## 2.0.1 under development
 
-- Enh #29: Remove unneeded casting to array in private method `RedisCache::iterableToArray()` (@vjik)
+- Enh #30: Remove unneeded casting to array in private method `RedisCache::iterableToArray()` (@vjik)
 
 ## 2.0.0 July 10, 2023
 
