@@ -157,7 +157,6 @@ final class RedisCache implements CacheInterface
             return $this->deleteMultiple($keys);
         }
 
-        /** @var mixed $value */
         foreach ($values as $key => $value) {
             $serializeValues[$key] = serialize($value);
         }
@@ -236,12 +235,13 @@ final class RedisCache implements CacheInterface
     /**
      * Converts iterable to array.
      *
-     * @return array
+     * @psalm-template T
+     * @psalm-param iterable<T> $iterable
+     * @psalm-return array<array-key,T>
      */
     private function iterableToArray(iterable $iterable): array
     {
-        /** @psalm-suppress RedundantCast */
-        return $iterable instanceof Traversable ? iterator_to_array($iterable) : (array) $iterable;
+        return $iterable instanceof Traversable ? iterator_to_array($iterable) : $iterable;
     }
 
     /**
