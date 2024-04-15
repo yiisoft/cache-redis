@@ -103,6 +103,7 @@ $client = new \Predis\Client([
 );
 $cache = new \Yiisoft\Cache\Redis\RedisCache($client);
 ```
+
 Predis will route commands on its own when specifying Redis nodes in the cluster to the appropriate nodes depending on the keys that are specified in the commands.
 
 You can implement `\Predis\Distribution\DistributorInterface` to create their own distributors used by the client to distribute keys among a cluster of servers.
@@ -165,21 +166,21 @@ The code is statically analyzed with [Psalm](https://psalm.dev/). To run static 
 
 ### Prepare
 
-```bash
+```shell
 # {{ v }} = 8.0, 8.1, 8.2. Default PHP 8.1
 make build v=8.1
 ```
 
 ### Unit testing
 
-```bash
+```shell
 # {{ v }} = 8.0, 8.1, 8.2. Default PHP 8.1
 make test v=8.1
 ```
 
 ### Mutation testing
 
-```bash
+```shell
 # {{ v }} = 8.0, 8.1, 8.2. Default PHP 8.1
 make mutation-test v=8.0
 ```
