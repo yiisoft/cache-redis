@@ -162,7 +162,7 @@ make mutation-test v=8.0
 
 ## Documentation
 
-- More information can be found in the [Internals.](docs/internals.md)
+- [Internals](docs/internals.md)
 
 ## Support
 
