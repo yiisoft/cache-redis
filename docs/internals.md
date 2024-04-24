@@ -1,7 +1,5 @@
 # Internals
 
-s
-
 > The tests use a connection to a running Redis cluster. If you are not using Docker, you must start the cluster yourself before running the tests.
 
 ## Testing in Docker
