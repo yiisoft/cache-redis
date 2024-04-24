@@ -133,33 +133,6 @@ $client = new \Predis\Client([
 );
 ```
 
-## Testing
-
-> The tests use a connection to a running Redis cluster. If you are not using Docker, you must start the cluster yourself before running the tests.
-
-## Testing in Docker
-
-### Prepare
-
-```shell
-# {{ v }} = 8.0, 8.1, 8.2. Default PHP 8.1
-make build v=8.1
-```
-
-### Unit testing
-
-```shell
-# {{ v }} = 8.0, 8.1, 8.2. Default PHP 8.1
-make test v=8.1
-```
-
-### Mutation testing
-
-```shell
-# {{ v }} = 8.0, 8.1, 8.2. Default PHP 8.1
-make mutation-test v=8.0
-```
-
 ## Documentation
 
 - [Internals](docs/internals.md)
