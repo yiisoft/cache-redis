@@ -1,4 +1,4 @@
-# Yii Redis Cache Change Log
+# Yii Caching Library - Redis Handler Change Log
 
 ## 2.0.1 under development
 
