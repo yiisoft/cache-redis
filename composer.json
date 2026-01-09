@@ -31,8 +31,8 @@
     ],
     "require": {
         "php": "^8.0",
-        "predis/predis": "^2.1",
-        "psr/simple-cache": "^2.0|^3.0"
+        "predis/predis": "^v3.0.0",
+        "psr/simple-cache": "^3.0"
     },
     "require-dev": {
         "maglnet/composer-require-checker": "^4.4",
@@ -40,7 +40,7 @@
         "rector/rector": "^2.0.3",
         "roave/infection-static-analysis-plugin": "^1.16",
         "spatie/phpunit-watcher": "^1.23",
-        "vimeo/psalm": "^4.30 || ^5.22"
+        "vimeo/psalm": "^5.22"
     },
     "autoload": {
         "psr-4": {

@@ -1,5 +1,5 @@
 on:
-  pull_request:
+  pull_request: &ignore-paths
     paths-ignore:
       - 'docs/**'
       - 'README.md'
@@ -10,16 +10,7 @@ on:
       - 'phpunit.xml.dist'
       - 'psalm.xml'
 
-  push:
-    paths-ignore:
-      - 'docs/**'
-      - 'README.md'
-      - 'CHANGELOG.md'
-      - '.gitignore'
-      - '.gitattributes'
-      - 'infection.json.dist'
-      - 'phpunit.xml.dist'
-      - 'psalm.xml'
+  push: *ignore-paths
 
 name: Composer require checker
 
@@ -30,4 +21,4 @@ jobs:
       os: >-
         ['ubuntu-latest']
       php: >-
-        ['8.0', '8.1', '8.2']
+        ['8.0', '8.1', '8.2', '8.3', '8.4']
