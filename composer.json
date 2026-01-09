@@ -29,6 +29,8 @@
             "url": "https://github.com/sponsors/yiisoft"
         }
     ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": "^8.1",
         "predis/predis": "^v3.0.0",
