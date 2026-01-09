@@ -35,7 +35,7 @@
         "psr/simple-cache": "^3.0"
     },
     "require-dev": {
-        "maglnet/composer-require-checker": "^4.4",
+        "maglnet/composer-require-checker": "^4.7.1",
         "phpunit/phpunit": "^9.5",
         "rector/rector": "^2.0.3",
         "roave/infection-static-analysis-plugin": "^1.35 || ^1.43",
