@@ -33,7 +33,7 @@ final class RedisCache implements CacheInterface
     /**
      * @var array<ConnectionInterface>|ConnectionInterface $connections Predis connection instances to use.
      */
-    private ConnectionInterface|array $connections;
+    private readonly ConnectionInterface|array $connections;
 
     /**
      * @param ClientInterface $client Predis client instance to use.
@@ -148,7 +148,7 @@ final class RedisCache implements CacheInterface
     public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
-        $keys = array_map('\strval', array_keys($values));
+        $keys = array_map(\strval(...), array_keys($values));
         $this->validateKeys($keys);
         $ttl = $this->normalizeTtl($ttl);
         $serializeValues = [];
