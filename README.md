@@ -20,7 +20,7 @@ implements [PSR-16](https://www.php-fig.org/psr/psr-16/) cache.
 
 ## Requirements
 
-- PHP 8.0 or higher.
+- PHP 8.1 or higher.
 
 ## Installation
 
