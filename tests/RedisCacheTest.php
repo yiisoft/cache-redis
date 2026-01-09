@@ -223,9 +223,7 @@ final class RedisCacheTest extends TestCase
 
         $reflection = new ReflectionObject($this->cache);
         $property = $reflection->getProperty('client');
-        $property->setAccessible(true);
         $client = $property->getValue($this->cache);
-        $property->setAccessible(false);
 
         foreach ($data as $key => $value) {
             $this->assertSameExceptObject($value, $this->cache->get((string) $key));
@@ -269,9 +267,7 @@ final class RedisCacheTest extends TestCase
 
         $reflection = new ReflectionObject($this->cache);
         $property = $reflection->getProperty('client');
-        $property->setAccessible(true);
         $property->setValue($this->cache, $client);
-        $property->setAccessible(false);
 
         $this->assertFalse($this->cache->setMultiple(['key' => 'value'], time()));
     }
@@ -345,9 +341,7 @@ final class RedisCacheTest extends TestCase
     {
         $reflection = new ReflectionObject($this->cache);
         $method = $reflection->getMethod('normalizeTtl');
-        $method->setAccessible(true);
         $result = $method->invokeArgs($this->cache, [$ttl]);
-        $method->setAccessible(false);
 
         $this->assertSameExceptObject($expectedResult, $result);
     }
@@ -470,7 +464,7 @@ final class RedisCacheTest extends TestCase
 
     private function prepareKeysOfValues(array $values): array
     {
-        return array_map('\strval', array_keys($values));
+        return array_map(\strval(...), array_keys($values));
     }
 
     private function getDataProviderData(): array

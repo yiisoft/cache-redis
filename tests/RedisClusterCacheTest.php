@@ -252,9 +252,7 @@ final class RedisClusterCacheTest extends TestCase
     {
         $reflection = new ReflectionObject($this->cache);
         $method = $reflection->getMethod('normalizeTtl');
-        $method->setAccessible(true);
         $result = $method->invokeArgs($this->cache, [$ttl]);
-        $method->setAccessible(false);
 
         $this->assertSameExceptObject($expectedResult, $result);
     }
@@ -338,7 +336,7 @@ final class RedisClusterCacheTest extends TestCase
      */
     private function prepareKeysOfValues(array $values): array
     {
-        return array_map('\strval', array_keys($values));
+        return array_map(\strval(...), array_keys($values));
     }
 
     /**
