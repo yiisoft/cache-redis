@@ -29,18 +29,20 @@
             "url": "https://github.com/sponsors/yiisoft"
         }
     ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
-        "php": "^8.0",
-        "predis/predis": "^2.1",
-        "psr/simple-cache": "^2.0|^3.0"
+        "php": "^8.1",
+        "predis/predis": "^v3.0.0",
+        "psr/simple-cache": "^3.0"
     },
     "require-dev": {
-        "maglnet/composer-require-checker": "^4.4",
+        "maglnet/composer-require-checker": "^4.7.1",
         "phpunit/phpunit": "^9.5",
-        "rector/rector": "^2.0.3",
-        "roave/infection-static-analysis-plugin": "^1.16",
-        "spatie/phpunit-watcher": "^1.23",
-        "vimeo/psalm": "^4.30 || ^5.22"
+        "rector/rector": "^2.2.14",
+        "roave/infection-static-analysis-plugin": "^1.35 || ^1.36",
+        "spatie/phpunit-watcher": "^1.24",
+        "vimeo/psalm": "^5.26.1 || ^6.0.0"
     },
     "autoload": {
         "psr-4": {

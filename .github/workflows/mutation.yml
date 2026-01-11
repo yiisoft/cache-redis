@@ -1,6 +1,6 @@
 on:
   pull_request:
-    paths-ignore:
+    paths-ignore: &ignore-paths
       - 'docs/**'
       - 'README.md'
       - 'CHANGELOG.md'
@@ -10,13 +10,7 @@ on:
 
   push:
     branches: [ 'master' ]
-    paths-ignore:
-      - 'docs/**'
-      - 'README.md'
-      - 'CHANGELOG.md'
-      - '.gitignore'
-      - '.gitattributes'
-      - 'psalm.xml'
+    paths-ignore: *ignore-paths
 
 name: Mutation test
 
@@ -29,11 +23,11 @@ jobs:
     strategy:
       matrix:
         os: [ 'ubuntu-latest' ]
-        php: [ '8.3' ]
+        php: [ '8.4' ]
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Run infection
         run: |

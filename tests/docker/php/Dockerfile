@@ -1,12 +1,12 @@
 # Important! Do not use this image in production!
 
 ARG PHP_VERSION
-FROM --platform=linux/amd64 php:${PHP_VERSION}-cli-alpine
+FROM php:${PHP_VERSION}-cli-alpine
 
-RUN apk add unzip zlib-dev libzip-dev autoconf g++ make
+RUN apk add unzip zlib-dev libzip-dev libsodium-dev icu-dev autoconf g++ make
 
-RUN docker-php-ext-install zip opcache
-RUN pecl install pcov-1.0.11
+RUN docker-php-ext-install zip opcache bcmath sodium intl
+RUN pecl install pcov
 RUN docker-php-ext-enable pcov
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
