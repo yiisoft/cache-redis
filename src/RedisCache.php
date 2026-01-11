@@ -38,7 +38,7 @@ final class RedisCache implements CacheInterface
     /**
      * @param ClientInterface $client Predis client instance to use.
      */
-    public function __construct(private ClientInterface $client)
+    public function __construct(private readonly ClientInterface $client)
     {
         $this->connections = $this->client->getConnection();
     }
