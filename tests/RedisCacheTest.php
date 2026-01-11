@@ -10,6 +10,7 @@ use Exception;
 use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
 use Predis\ClientInterface;
+use Predis\Connection\ConnectionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Predis\Client;
 use ReflectionException;
@@ -257,19 +258,18 @@ final class RedisCacheTest extends TestCase
     {
         $client = $this
             ->getMockBuilder(ClientInterface::class)
+            ->onlyMethods(['getConnection'])
             ->addMethods(['exec'])
-            ->getMockForAbstractClass()
-        ;
+            ->getMockForAbstractClass();
 
-        $client
+        $client->method('getConnection')
+            ->willReturn($this->createMock(ConnectionInterface::class));
+
+        $client->expects($this->once())
             ->method('exec')
             ->willReturn([null]);
 
-        $reflection = new ReflectionObject($this->cache);
-        $property = $reflection->getProperty('client');
-        $property->setValue($this->cache, $client);
-
-        $this->assertFalse($this->cache->setMultiple(['key' => 'value'], time()));
+        $this->assertFalse((new RedisCache($client))->setMultiple(['key' => 'value'], time()));
     }
 
     public function testGetMultiple(): void

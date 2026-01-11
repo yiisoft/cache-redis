@@ -5,7 +5,8 @@ FROM php:${PHP_VERSION}-cli-alpine
 
 RUN apk add unzip zlib-dev libzip-dev libsodium-dev icu-dev autoconf g++ make
 
-RUN docker-php-ext-install zip opcache bcmath sodium intl
+RUN docker-php-ext-install zip bcmath sodium intl \
+    && docker-php-ext-install opcache || true # For backward compatibility with PHP versions below 8.5
 RUN pecl install pcov
 RUN docker-php-ext-enable pcov
 

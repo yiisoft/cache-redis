@@ -30,7 +30,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "8.1 - 8.5",
         "predis/predis": "^v3.0.0",
         "psr/simple-cache": "^3.0"
     },
