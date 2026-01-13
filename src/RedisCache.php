@@ -22,6 +22,7 @@ use function iterator_to_array;
 use function serialize;
 use function strpbrk;
 use function unserialize;
+use function in_array;
 
 /**
  * RedisCache stores cache data in a Redis.
@@ -43,26 +44,6 @@ final class RedisCache implements CacheInterface
         $this->connections = $this->client->getConnection();
     }
 
-    /**
-     * Returns whether Predis cluster is used.
-     *
-     * @return bool Whether Predis cluster is used.
-     */
-    private function isCluster(): bool
-    {
-        /** @psalm-suppress MixedAssignment, PossibleRawObjectIteration */
-        foreach ($this->connections as $connection) {
-            /** @var StreamConnection $connection */
-            $cluster = (new Client($connection->getParameters()))->info('Cluster');
-            /** @psalm-suppress MixedArrayAccess */
-            if (isset($cluster['Cluster']['cluster_enabled']) && 1 === (int)$cluster['Cluster']['cluster_enabled']) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public function get(string $key, mixed $default = null): mixed
     {
         $this->validateKey($key);
@@ -71,7 +52,7 @@ final class RedisCache implements CacheInterface
         return $value === null ? $default : unserialize($value);
     }
 
-    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
+    public function set(string $key, mixed $value, int|DateInterval|null $ttl = null): bool
     {
         $ttl = $this->normalizeTtl($ttl);
 
@@ -145,7 +126,7 @@ final class RedisCache implements CacheInterface
         return $values;
     }
 
-    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
+    public function setMultiple(iterable $values, int|DateInterval|null $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
         $keys = array_map(\strval(...), array_keys($values));
@@ -164,7 +145,7 @@ final class RedisCache implements CacheInterface
         $results = [];
         if ($this->isCluster()) {
             foreach ($serializeValues as $key => $value) {
-                $this->set((string)$key, $value, $this->isInfinityTtl($ttl) ? null : $ttl);
+                $this->set((string) $key, $value, $this->isInfinityTtl($ttl) ? null : $ttl);
             }
         } else {
             if ($this->isInfinityTtl($ttl)) {
@@ -176,14 +157,14 @@ final class RedisCache implements CacheInterface
             $this->client->mset($serializeValues);
 
             foreach ($keys as $key) {
-                $this->client->expire($key, (int)$ttl);
+                $this->client->expire($key, (int) $ttl);
             }
 
             /** @var array|null $results */
             $results = $this->client->exec();
         }
 
-        return !in_array(null, (array)$results, true);
+        return !in_array(null, (array) $results, true);
     }
 
     public function deleteMultiple(iterable $keys): bool
@@ -211,13 +192,33 @@ final class RedisCache implements CacheInterface
     }
 
     /**
+     * Returns whether Predis cluster is used.
+     *
+     * @return bool Whether Predis cluster is used.
+     */
+    private function isCluster(): bool
+    {
+        /** @psalm-suppress MixedAssignment, PossibleRawObjectIteration */
+        foreach ($this->connections as $connection) {
+            /** @var StreamConnection $connection */
+            $cluster = (new Client($connection->getParameters()))->info('Cluster');
+            /** @psalm-suppress MixedArrayAccess */
+            if (isset($cluster['Cluster']['cluster_enabled']) && 1 === (int) $cluster['Cluster']['cluster_enabled']) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Normalizes cache TTL handling `null` value, strings and {@see DateInterval} objects.
      *
      * @param DateInterval|int|string|null $ttl The raw TTL.
      *
      * @return int|null TTL value as UNIX timestamp.
      */
-    private function normalizeTtl(null|int|string|DateInterval $ttl): ?int
+    private function normalizeTtl(int|string|DateInterval|null $ttl): ?int
     {
         if ($ttl === null) {
             return null;

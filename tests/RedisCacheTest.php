@@ -290,7 +290,7 @@ final class RedisCacheTest extends TestCase
         $this->assertSameExceptObject($data, $this->cache->getMultiple($keys));
         $this->assertTrue($this->cache->deleteMultiple($keys));
 
-        $emptyData = array_map(static fn () => null, $data);
+        $emptyData = array_map(static fn() => null, $data);
 
         $this->assertSameExceptObject($emptyData, $this->cache->getMultiple($keys));
     }
@@ -359,7 +359,7 @@ final class RedisCacheTest extends TestCase
             ],
             'IteratorAggregate' => [
                 ['a' => 1, 'b' => 2,],
-                new class () implements IteratorAggregate {
+                new class implements IteratorAggregate {
                     public function getIterator(): ArrayIterator
                     {
                         return new ArrayIterator(['a' => 1, 'b' => 2,]);
