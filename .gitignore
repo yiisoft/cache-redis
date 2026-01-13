@@ -30,3 +30,7 @@ phpunit.phar
 .phpunit.result.cache
 # phpunit coverage report
 coverage.xml
+
+# PHP CS Fixer
+/.php-cs-fixer.cache
+/.php-cs-fixer.php
