@@ -6,6 +6,7 @@
 - Chg #38: Bump minimum PHP version to `8.1` (@s1lver)
 - Chg #40: Make `RedisCache::$client` readonly (@s1lver)
 - Enh #41: Explicitly import classes and functions in "use" section (@mspirkov)
+- Enh #42: Remove unnecessary files from Composer package (@mspirkov)
 
 ## 2.0.0 July 10, 2023
 
