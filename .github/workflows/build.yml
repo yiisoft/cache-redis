@@ -18,6 +18,10 @@ name: Run tests
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     name: PHP ${{ matrix.php }}
@@ -34,12 +38,16 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           persist-credentials: false
 
       - name: Build
-        run: make build v=${{ matrix.php }}
+        run: make build v="${PHP_VERSION}"
+        env:
+          PHP_VERSION: ${{ matrix.php }}
 
       - name: Run tests with phpunit
-        run: make test v=${{ matrix.php }}
+        run: make test v="${PHP_VERSION}"
+        env:
+          PHP_VERSION: ${{ matrix.php }}
