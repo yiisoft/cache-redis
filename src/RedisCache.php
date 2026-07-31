@@ -23,6 +23,7 @@ use function serialize;
 use function strpbrk;
 use function unserialize;
 use function in_array;
+use function strval;
 
 /**
  * RedisCache stores cache data in a Redis.
@@ -129,7 +130,7 @@ final class RedisCache implements CacheInterface
     public function setMultiple(iterable $values, int|DateInterval|null $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
-        $keys = array_map(\strval(...), array_keys($values));
+        $keys = array_map(strval(...), array_keys($values));
         $this->validateKeys($keys);
         $ttl = $this->normalizeTtl($ttl);
         $serializeValues = [];
