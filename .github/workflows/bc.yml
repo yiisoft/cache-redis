@@ -1,22 +1,21 @@
+name: backwards compatibility
+
 on:
   pull_request:
-    paths-ignore: &ignore-paths
-      - 'docs/**'
-      - 'README.md'
-      - 'CHANGELOG.md'
-      - '.gitignore'
-      - '.gitattributes'
-      - 'infection.json.dist'
-      - 'phpunit.xml.dist'
-      - 'psalm.xml'
+    paths: &paths
+      - 'src/**'
+      - 'composer.json'
+      - '.github/workflows/bc.yml'
   push:
     branches: ['master']
-    paths-ignore: *ignore-paths
-
-name: backwards compatibility
+    paths: *paths
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   roave_bc_check:
@@ -25,4 +24,4 @@ jobs:
       os: >-
         ['ubuntu-latest']
       php: >-
-        ['8.2']
+        ['8.5']

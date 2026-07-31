@@ -1,25 +1,22 @@
+name: Run tests
+
 on:
   pull_request:
-    paths-ignore: &ignore-paths
-      - 'docs/**'
-      - 'README.md'
-      - 'CHANGELOG.md'
-      - '.gitignore'
-      - '.gitattributes'
-      - 'infection.json.dist'
-      - 'psalm.xml'
-
+    paths: &paths
+      - 'src/**'
+      - 'tests/**'
+      - 'phpunit.xml.dist'
+      - 'composer.json'
+      - '.github/workflows/build.yml'
   push:
-    branches: [ 'master' ]
-    paths-ignore: *ignore-paths
-
-name: Run tests
+    branches: ['master']
+    paths: *paths
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

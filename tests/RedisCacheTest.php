@@ -23,6 +23,7 @@ use function array_map;
 use function is_array;
 use function is_object;
 use function time;
+use function strval;
 
 final class RedisCacheTest extends TestCase
 {
@@ -464,7 +465,7 @@ final class RedisCacheTest extends TestCase
 
     private function prepareKeysOfValues(array $values): array
     {
-        return array_map(\strval(...), array_keys($values));
+        return array_map(strval(...), array_keys($values));
     }
 
     private function getDataProviderData(): array

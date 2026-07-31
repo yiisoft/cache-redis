@@ -20,6 +20,7 @@ use function array_keys;
 use function array_map;
 use function is_array;
 use function is_object;
+use function strval;
 
 /**
  * Tests for Redis cluster instance
@@ -381,7 +382,7 @@ final class RedisClusterCacheTest extends TestCase
      */
     private function prepareKeysOfValues(array $values): array
     {
-        return array_map(\strval(...), array_keys($values));
+        return array_map(strval(...), array_keys($values));
     }
 
     /**
